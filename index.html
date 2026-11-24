@@ -1,0 +1,1966 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GanadoPro — Nutrición y Gestión Ganadera</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        forest: {
+                            900: '#1B4332',
+                            800: '#23533E',
+                            700: '#2D6A4F',
+                            600: '#40916C',
+                            500: '#52B788',
+                            100: '#D8F3DC',
+                            50:  '#F0FDF4',
+                        },
+                        surface: '#F8FAFC'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8FAFC;
+            color: #1E293B;
+        }
+
+        /* Custom subtle scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #F1F5F9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94A3B8;
+        }
+
+        /* Print optimization */
+        @media print {
+            aside, header, .no-print {
+                display: none !important;
+            }
+            main {
+                margin-left: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+            }
+            .print-break-inside {
+                break-inside: avoid;
+            }
+            body {
+                background-color: white !important;
+            }
+            .shadow-sm, .shadow-md, .shadow-lg {
+                box-shadow: none !important;
+                border: 1px solid #E2E8F0 !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-surface text-slate-800 antialiased overflow-x-hidden">
+
+    <!-- Mobile Header -->
+    <header class="lg:hidden fixed top-0 left-0 right-0 h-16 bg-forest-900 text-white flex items-center justify-between px-4 z-40 shadow-md no-print">
+        <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-forest-700 flex items-center justify-center border border-forest-500/30">
+                <i data-lucide="sprout" class="w-5 h-5 text-forest-100"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-base leading-tight tracking-tight">GanadoPro</h1>
+                <p class="text-[11px] text-forest-100/80 leading-tight">Nutrición y Gestión</p>
+            </div>
+        </div>
+        <button id="mobile-menu-btn" class="p-2 rounded-lg hover:bg-forest-800 transition-colors" aria-label="Abrir menú">
+            <i data-lucide="menu" class="w-6 h-6"></i>
+        </button>
+    </header>
+
+    <!-- Mobile Sidebar Backdrop -->
+    <div id="sidebar-backdrop" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden lg:hidden no-print"></div>
+
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="fixed top-0 left-0 bottom-0 w-72 bg-forest-900 text-white z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out flex flex-col shadow-xl no-print">
+        <!-- Brand -->
+        <div class="h-20 flex items-center justify-between px-6 border-b border-white/10">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-forest-700 flex items-center justify-center shadow-inner border border-forest-500/30">
+                    <i data-lucide="sprout" class="w-6 h-6 text-forest-100"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg tracking-tight leading-none">GanadoPro</h1>
+                    <p class="text-xs text-forest-100/75 mt-1">Nutrición y Gestión</p>
+                </div>
+            </div>
+            <button id="close-sidebar-btn" class="lg:hidden p-1.5 rounded-lg hover:bg-forest-800 text-forest-100">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+
+        <!-- Navigation Links -->
+        <nav class="flex-1 px-4 py-6 space-y-1.5 overflow-y-auto">
+            <p class="px-3 text-[11px] font-semibold uppercase tracking-wider text-forest-100/50 mb-2">Módulos Activos</p>
+            
+            <button data-tab="formulacion" class="nav-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-all bg-forest-700 text-white shadow-sm">
+                <i data-lucide="calculator" class="w-5 h-5 shrink-0"></i>
+                <span>Formulación de Dieta</span>
+            </button>
+
+            <button data-tab="insumos" class="nav-btn w-full flex items-center gap-3 px-3.5 py-3 rounded-xl text-sm font-medium transition-all text-forest-100/80 hover:bg-forest-800 hover:text-white">
+                <i data-lucide="database" class="w-5 h-5 shrink-0"></i>
+                <span>Base de Datos de Insumos</span>
+            </button>
+
+            <div class="pt-5 pb-2">
+                <p class="px-3 text-[11px] font-semibold uppercase tracking-wider text-forest-100/50">Gestión Integral</p>
+            </div>
+
+            <button data-tab="inventario" class="nav-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-medium transition-all text-forest-100/70 hover:bg-forest-800 hover:text-white">
+                <div class="flex items-center gap-3">
+                    <i data-lucide="clipboard-list" class="w-5 h-5 shrink-0"></i>
+                    <span>Inventario de Ganado</span>
+                </div>
+                <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30">Próximamente</span>
+            </button>
+
+            <button data-tab="gastos" class="nav-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-medium transition-all text-forest-100/70 hover:bg-forest-800 hover:text-white">
+                <div class="flex items-center gap-3">
+                    <i data-lucide="wallet" class="w-5 h-5 shrink-0"></i>
+                    <span>Gastos e Inversiones</span>
+                </div>
+                <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30">Próximamente</span>
+            </button>
+        </nav>
+
+        <!-- Footer / Reset Data -->
+        <div class="p-4 border-t border-white/10 space-y-3">
+            <button id="btn-reset-data" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-medium bg-white/5 hover:bg-white/10 text-forest-100 border border-white/10 transition-colors">
+                <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                <span>Restaurar datos originales</span>
+            </button>
+            <div class="text-[11px] text-center text-forest-100/50">
+                Solver Simplex • NRC/NASEM
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="lg:ml-72 pt-20 lg:pt-8 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto min-h-screen">
+
+        <!-- =================================================================== -->
+        <!-- MÓDULO 2: FORMULACIÓN DE DIETA (ACTIVO POR DEFECTO)                 -->
+        <!-- =================================================================== -->
+        <section id="tab-formulacion" class="tab-content space-y-6">
+            <!-- Header -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Formulación de Dieta al Menor Costo</h2>
+                    <p class="text-sm text-slate-500 mt-1">Configura el perfil del ganado, ajusta los insumos disponibles y optimiza la ración con programación lineal.</p>
+                </div>
+                <div class="flex items-center gap-2 no-print">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-forest-50 text-forest-700 border border-forest-100">
+                        <span class="w-2 h-2 rounded-full bg-forest-500 animate-pulse"></span>
+                        Solver Simplex Listo
+                    </span>
+                </div>
+            </div>
+
+            <!-- PASO 1: PERFIL DEL ANIMAL Y REQUERIMIENTOS -->
+            <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+                <!-- Perfil del Animal (7 cols) -->
+                <div class="xl:col-span-7 bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 sm:p-6">
+                    <div class="flex items-center gap-2.5 mb-5 pb-3 border-b border-slate-100">
+                        <span class="w-7 h-7 rounded-lg bg-forest-900 text-white text-xs font-bold flex items-center justify-center">1</span>
+                        <div>
+                            <h3 class="font-semibold text-slate-900 text-base">Perfil del Animal y Manejo</h3>
+                            <p class="text-xs text-slate-500">Basado en NRC/NASEM y Manual de Bovinos (Mendoza & Ricalde)</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Propósito -->
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Propósito / Etapa Productiva</label>
+                            <select id="animal-proposito" class="w-full rounded-xl border border-slate-300 bg-slate-50/50 px-3.5 py-2.5 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-forest-600 focus:border-forest-600">
+                                <option value="recepcion">Engorda - Recepción (Adaptación)</option>
+                                <option value="desarrollo" selected>Engorda - Desarrollo (Crecimiento)</option>
+                                <option value="finalizacion">Engorda - Finalización (Acabado)</option>
+                                <option value="lechero">Lechero (Producción)</option>
+                                <option value="mantenimiento">Mantenimiento (Cría / Vientres)</option>
+                            </select>
+                        </div>
+
+                        <!-- Sexo -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Sexo</label>
+                            <select id="animal-sexo" class="w-full rounded-xl border border-slate-300 bg-slate-50/50 px-3.5 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-forest-600">
+                                <option value="macho_entero" selected>Macho Entero (Toro)</option>
+                                <option value="novillo">Novillo (Castrado)</option>
+                                <option value="hembra">Hembra (Vaquilla / Vaca)</option>
+                            </select>
+                        </div>
+
+                        <!-- Raza -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Raza / Tipo Genético</label>
+                            <select id="animal-raza" class="w-full rounded-xl border border-slate-300 bg-slate-50/50 px-3.5 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-forest-600">
+                                <option value="cruza" selected>Cruza (F1 / Comercial)</option>
+                                <option value="europeo">Europeo (Angus, Charolais, Hereford)</option>
+                                <option value="cebu">Cebú (Brahman, Nelore)</option>
+                                <option value="lechero">Lechero (Holstein, Suizo)</option>
+                            </select>
+                        </div>
+
+                        <!-- Peso Vivo -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Peso Vivo Promedio (kg)</label>
+                            <input type="number" id="animal-peso" value="320" min="80" max="1100" step="5" class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-forest-600">
+                        </div>
+
+                        <!-- Edad -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Edad Promedio (meses)</label>
+                            <input type="number" id="animal-edad" value="10" min="3" max="120" step="1" class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-forest-600">
+                        </div>
+
+                        <!-- Meta Productiva: GDP (Engorda) -->
+                        <div id="container-meta-gdp">
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Meta: Ganancia Diaria (kg/día)</label>
+                            <input type="number" id="animal-gdp" value="1.5" min="0.4" max="2.5" step="0.1" class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-forest-600">
+                        </div>
+
+                        <!-- Meta Productiva: Leche (Lechero) -->
+                        <div id="container-meta-leche" class="hidden">
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Meta: Producción de Leche (L/día)</label>
+                            <input type="number" id="animal-leche" value="22" min="5" max="55" step="1" class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-forest-600">
+                        </div>
+
+                        <!-- Temperatura Ambiental -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Temperatura Ambiental (°C)</label>
+                            <input type="number" id="animal-temp" value="28" min="-5" max="50" step="1" class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-forest-600">
+                        </div>
+
+                        <!-- Implante Anabólico -->
+                        <div class="sm:col-span-2 pt-1">
+                            <label class="flex items-center gap-3 p-3 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-slate-50 cursor-pointer transition-colors">
+                                <input type="checkbox" id="animal-implante" class="w-4 h-4 rounded text-forest-700 focus:ring-forest-600 border-slate-300">
+                                <div>
+                                    <span class="block text-sm font-semibold text-slate-800">¿Usa Implante Anabólico?</span>
+                                    <span class="block text-xs text-slate-500">Incrementa consumo de MS (+4%) y requerimiento de Proteína Cruda (+0.6% PC)</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Requerimientos Calculados (5 cols) -->
+                <div class="xl:col-span-5 bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 sm:p-6 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+                            <div class="flex items-center gap-2">
+                                <i data-lucide="activity" class="w-5 h-5 text-forest-700"></i>
+                                <h3 class="font-semibold text-slate-900 text-base">Requerimientos Nutricionales</h3>
+                            </div>
+                            <button id="btn-recalc-req" class="text-xs font-medium text-forest-700 hover:text-forest-900 flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-forest-50 transition-colors" title="Recalcular automáticamente">
+                                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                                Auto
+                            </button>
+                        </div>
+
+                        <div class="space-y-3.5">
+                            <!-- Consumo MS -->
+                            <div class="p-3.5 rounded-xl bg-forest-50/70 border border-forest-100 flex items-center justify-between">
+                                <div>
+                                    <span class="block text-xs font-semibold text-forest-900">Consumo de Materia Seca (CMS)</span>
+                                    <span id="req-cms-pct" class="text-xs text-forest-700">2.65% del Peso Vivo</span>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <input type="number" id="req-cms" step="0.1" min="2" max="35" class="w-20 text-right font-bold text-lg text-forest-900 bg-white border border-forest-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-forest-600">
+                                    <span class="text-xs font-semibold text-forest-800">kg/d</span>
+                                </div>
+                            </div>
+
+                            <!-- PC Mínima -->
+                            <div class="flex items-center justify-between p-3 rounded-xl border border-slate-200/80 bg-white">
+                                <div>
+                                    <span class="block text-xs font-semibold text-slate-700">Proteína Cruda Mínima (% PC)</span>
+                                    <span class="text-[11px] text-slate-500">En Base Seca</span>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <input type="number" id="req-pc" step="0.1" min="5" max="25" class="w-20 text-right font-bold text-slate-900 bg-slate-50 border border-slate-300 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-forest-600">
+                                    <span class="text-xs font-medium text-slate-500">%</span>
+                                </div>
+                            </div>
+
+                            <!-- Energía Mínima -->
+                            <div class="flex items-center justify-between p-3 rounded-xl border border-slate-200/80 bg-white">
+                                <div>
+                                    <span id="req-en-label" class="block text-xs font-semibold text-slate-700">Energía de Ganancia (ENg)</span>
+                                    <span class="text-[11px] text-slate-500">Mcal / kg de Materia Seca</span>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <input type="number" id="req-en" step="0.02" min="0.4" max="2.2" class="w-20 text-right font-bold text-slate-900 bg-slate-50 border border-slate-300 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-forest-600">
+                                    <span class="text-xs font-medium text-slate-500">Mcal</span>
+                                </div>
+                            </div>
+
+                            <!-- FDN Mínima -->
+                            <div class="flex items-center justify-between p-3 rounded-xl border border-slate-200/80 bg-white">
+                                <div>
+                                    <span class="block text-xs font-semibold text-slate-700">Fibra Detergente Neutro (% FDN)</span>
+                                    <span class="text-[11px] text-slate-500">Mínimo para salud ruminal</span>
+                                </div>
+                                <div class="flex items-center gap-1.5">
+                                    <input type="number" id="req-fdn" step="0.5" min="8" max="60" class="w-20 text-right font-bold text-slate-900 bg-slate-50 border border-slate-300 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-forest-600">
+                                    <span class="text-xs font-medium text-slate-500">%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nota Técnica -->
+                    <div id="nota-tecnica" class="mt-4 p-3.5 rounded-xl bg-amber-50 border border-amber-200/80 text-xs text-amber-900 flex gap-2.5 items-start">
+                        <i data-lucide="info" class="w-4 h-4 text-amber-600 shrink-0 mt-0.5"></i>
+                        <p id="nota-tecnica-texto" class="leading-relaxed"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PASO 2: SELECCIÓN DE INSUMOS Y LÍMITES -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 sm:p-6 no-print">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-100">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-7 h-7 rounded-lg bg-forest-900 text-white text-xs font-bold flex items-center justify-center">2</span>
+                        <div>
+                            <h3 class="font-semibold text-slate-900 text-base">Insumos Disponibles y Límites de Inclusión (% Base Seca)</h3>
+                            <p class="text-xs text-slate-500">Selecciona los ingredientes que tienes en bodega y ajusta sus topes mínimos o máximos.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button id="btn-select-all-ing" class="text-xs font-medium px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors">Todos</button>
+                        <button id="btn-goto-db" class="text-xs font-medium px-3 py-1.5 rounded-lg bg-forest-50 hover:bg-forest-100 text-forest-800 transition-colors flex items-center gap-1">
+                            <i data-lucide="edit-3" class="w-3.5 h-3.5"></i> Editar Precios
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="border-b border-slate-200 text-[11px] font-semibold uppercase tracking-wider text-slate-500 bg-slate-50/70">
+                                <th class="py-2.5 px-3 rounded-tl-lg w-10 text-center">Usar</th>
+                                <th class="py-2.5 px-3">Insumo</th>
+                                <th class="py-2.5 px-3 hidden md:table-cell">Categoría</th>
+                                <th class="py-2.5 px-3 text-right">Precio ($/kg)</th>
+                                <th class="py-2.5 px-3 text-right hidden sm:table-cell">PC %</th>
+                                <th class="py-2.5 px-3 text-right hidden sm:table-cell">ENg / ENm</th>
+                                <th class="py-2.5 px-3 text-right hidden lg:table-cell">FDN %</th>
+                                <th class="py-2.5 px-3 text-center w-24">Mín %</th>
+                                <th class="py-2.5 px-3 text-center w-24 rounded-tr-lg">Máx %</th>
+                            </tr>
+                        </thead>
+                        <tbody id="solver-ingredients-tbody" class="divide-y divide-slate-100 text-sm">
+                            <!-- Rendered dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Botón Calcular Solver -->
+                <div class="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-100">
+                    <p class="text-xs text-slate-500">
+                        El algoritmo <strong>Simplex de Dos Fases</strong> busca la combinación exacta de menor costo en Base Húmeda cumpliendo el 100% de Base Seca.
+                    </p>
+                    <button id="btn-run-solver" class="w-full sm:w-auto flex items-center justify-center gap-2.5 px-7 py-3.5 rounded-xl bg-forest-900 hover:bg-forest-800 active:scale-[0.99] text-white font-semibold text-sm shadow-md shadow-forest-900/20 transition-all">
+                        <i data-lucide="sparkles" class="w-5 h-5 text-forest-100"></i>
+                        <span>CALCULAR FÓRMULA AL MENOR COSTO (SOLVER)</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- MENSAJE DE ERROR / INFACTIBILIDAD -->
+            <div id="solver-error-box" class="hidden rounded-2xl bg-red-50 border border-red-200 p-5 text-red-900 shadow-sm">
+                <div class="flex items-start gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-red-100 flex items-center justify-center shrink-0">
+                        <i data-lucide="alert-triangle" class="w-5 h-5 text-red-600"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-sm text-red-900">No se encontró una fórmula factible</h4>
+                        <p id="solver-error-msg" class="text-sm text-red-700 mt-1"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PASO 3: RESULTADOS DE LA FORMULACIÓN -->
+            <div id="results-section" class="hidden space-y-6">
+                <!-- Barra de Escala y Acciones -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                    <div class="flex flex-wrap items-center gap-3">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500">Escala de Mezcla:</span>
+                        <div class="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200/80">
+                            <button data-scale="100ms" class="scale-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-all bg-white text-forest-900 shadow-sm">100 kg MS</button>
+                            <button data-scale="tonelada" class="scale-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-600 hover:text-slate-900">1 Tonelada (BH)</button>
+                            <button data-scale="lote" class="scale-btn px-3 py-1.5 rounded-lg text-xs font-semibold transition-all text-slate-600 hover:text-slate-900">Para mi Lote</button>
+                        </div>
+                        <div id="lote-input-container" class="hidden flex items-center gap-2 bg-forest-50 px-3 py-1 rounded-xl border border-forest-200">
+                            <label class="text-xs font-semibold text-forest-900">Cabezas:</label>
+                            <input type="number" id="lote-cabezas" value="30" min="1" max="10000" class="w-16 text-center font-bold text-sm bg-white border border-forest-300 rounded-lg py-0.5 text-forest-900 focus:outline-none">
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 no-print">
+                        <button id="btn-export-csv" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors">
+                            <i data-lucide="download" class="w-4 h-4"></i>
+                            Exportar CSV
+                        </button>
+                        <button id="btn-print-recipe" class="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-forest-700 hover:bg-forest-800 text-white text-xs font-semibold transition-colors shadow-sm">
+                            <i data-lucide="printer" class="w-4 h-4"></i>
+                            Imprimir Receta
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tarjetas KPI Principales -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- KPI 1: Costo por Kg Servido -->
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-semibold text-slate-500">Costo / Kg Servido (BH)</span>
+                            <div class="w-8 h-8 rounded-lg bg-forest-50 flex items-center justify-center text-forest-700">
+                                <i data-lucide="dollar-sign" class="w-4 h-4"></i>
+                            </div>
+                        </div>
+                        <div id="kpi-costo-kg" class="text-2xl font-extrabold text-slate-900">$0.00</div>
+                        <p id="kpi-costo-ton" class="text-xs text-slate-500 mt-1">$0.00 / Tonelada</p>
+                    </div>
+
+                    <!-- KPI 2: Costo Diario por Animal -->
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-semibold text-slate-500">Costo Diario / Animal</span>
+                            <div class="w-8 h-8 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-700">
+                                <i data-lucide="calendar-days" class="w-4 h-4"></i>
+                            </div>
+                        </div>
+                        <div id="kpi-costo-dia" class="text-2xl font-extrabold text-forest-900">$0.00</div>
+                        <p id="kpi-costo-mes" class="text-xs text-slate-500 mt-1">$0.00 / mes por cabeza</p>
+                    </div>
+
+                    <!-- KPI 3: Kilos a Servir BH vs MS -->
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-semibold text-slate-500">Ración Diaria / Animal</span>
+                            <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-700">
+                                <i data-lucide="scale" class="w-4 h-4"></i>
+                            </div>
+                        </div>
+                        <div id="kpi-kg-servir" class="text-2xl font-extrabold text-slate-900">0.00 kg</div>
+                        <p id="kpi-ms-agua" class="text-xs text-slate-500 mt-1">MS: 0% | Agua: 0%</p>
+                    </div>
+
+                    <!-- KPI 4: Cumplimiento Nutricional -->
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-semibold text-slate-500">Cumplimiento Nutricional</span>
+                            <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">ÓPTIMO</span>
+                        </div>
+                        <div class="space-y-1.5 text-xs mt-1">
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-600">PC Lograda:</span>
+                                <span id="kpi-pc-val" class="font-bold text-emerald-700">0.0%</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span id="kpi-en-label" class="text-slate-600">ENg Lograda:</span>
+                                <span id="kpi-en-val" class="font-bold text-emerald-700">0.00 Mcal</span>
+                            </div>
+                            <div class="flex justify-between items-center">
+                                <span class="text-slate-600">FDN Lograda:</span>
+                                <span id="kpi-fdn-val" class="font-bold text-emerald-700">0.0%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla de Fórmula Óptima -->
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden print-break-inside">
+                    <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-base">Receta de Fórmula Óptima</h3>
+                            <p id="tabla-escala-subtitulo" class="text-xs text-slate-500">Mostrando cantidades para 100 kg de Materia Seca</p>
+                        </div>
+                        <span class="text-xs font-medium text-forest-700 bg-forest-50 px-3 py-1 rounded-full border border-forest-100 self-start sm:self-auto">
+                            Pesos Mexicanos (MXN)
+                        </span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-50 text-[11px] font-semibold uppercase tracking-wider text-slate-500 border-b border-slate-200">
+                                    <th class="py-3 px-4">Insumo</th>
+                                    <th class="py-3 px-4 text-right">% Dieta (BS)</th>
+                                    <th class="py-3 px-4 text-right">Kilos a Servir (BH)</th>
+                                    <th class="py-3 px-4 text-right">Precio ($/kg)</th>
+                                    <th class="py-3 px-4 text-right">Costo Real ($)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="results-tbody" class="divide-y divide-slate-100 text-sm">
+                                <!-- Populated by JS -->
+                            </tbody>
+                            <tfoot id="results-tfoot" class="bg-forest-50/70 font-bold text-slate-900 border-t-2 border-forest-200 text-sm">
+                                <!-- Populated by JS -->
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Gráficas Lado a Lado -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 print-break-inside">
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5">
+                        <h4 class="font-semibold text-slate-900 text-sm mb-4">Composición de la Dieta (% Base Seca)</h4>
+                        <div class="relative h-64 w-full flex items-center justify-center">
+                            <canvas id="chart-composition"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5">
+                        <h4 class="font-semibold text-slate-900 text-sm mb-4">Aporte al Costo Total por Insumo ($)</h4>
+                        <div class="relative h-64 w-full">
+                            <canvas id="chart-cost"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mini-Calculadora de Rentabilidad -->
+                <div class="bg-gradient-to-br from-forest-900 to-forest-800 rounded-2xl shadow-md p-6 text-white print-break-inside">
+                    <div class="flex items-center gap-2.5 mb-5">
+                        <div class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center">
+                            <i data-lucide="trending-up" class="w-5 h-5 text-forest-100"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg leading-tight">Proyección de Rentabilidad (Engorda)</h3>
+                            <p class="text-xs text-forest-100/80">Estima tu margen sobre alimento según el peso objetivo y precio de venta en pie.</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                        <div>
+                            <label class="block text-xs font-medium text-forest-100 mb-1">Peso Inicial (kg)</label>
+                            <input type="number" id="rent-peso-ini" value="320" min="50" max="900" class="w-full rounded-xl bg-white/10 border border-white/20 px-3.5 py-2 text-sm font-bold text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-forest-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-forest-100 mb-1">Peso Final Objetivo (kg)</label>
+                            <input type="number" id="rent-peso-fin" value="520" min="100" max="1100" class="w-full rounded-xl bg-white/10 border border-white/20 px-3.5 py-2 text-sm font-bold text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-forest-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-forest-100 mb-1">Precio Venta en Pie ($/kg)</label>
+                            <input type="number" id="rent-precio-pie" value="75" min="20" max="200" step="1" class="w-full rounded-xl bg-white/10 border border-white/20 px-3.5 py-2 text-sm font-bold text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-forest-500">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 lg:grid-cols-5 gap-3">
+                        <div class="bg-white/10 rounded-xl p-3.5 border border-white/10">
+                            <span class="block text-[11px] text-forest-100/80">Kilos a Ganar</span>
+                            <span id="rent-kg-ganar" class="block text-lg font-bold mt-0.5">200 kg</span>
+                        </div>
+                        <div class="bg-white/10 rounded-xl p-3.5 border border-white/10">
+                            <span class="block text-[11px] text-forest-100/80">Días Estimados</span>
+                            <span id="rent-dias" class="block text-lg font-bold mt-0.5">133 días</span>
+                        </div>
+                        <div class="bg-white/10 rounded-xl p-3.5 border border-white/10">
+                            <span class="block text-[11px] text-forest-100/80">Gasto Total Alimento</span>
+                            <span id="rent-gasto-alim" class="block text-lg font-bold mt-0.5 text-amber-300">$0</span>
+                        </div>
+                        <div class="bg-white/10 rounded-xl p-3.5 border border-white/10">
+                            <span class="block text-[11px] text-forest-100/80">Ingreso Kilos Ganados</span>
+                            <span id="rent-ingreso" class="block text-lg font-bold mt-0.5">$0</span>
+                        </div>
+                        <div class="col-span-2 lg:col-span-1 bg-emerald-500/20 rounded-xl p-3.5 border border-emerald-400/40">
+                            <span class="block text-[11px] text-emerald-200 font-semibold">Margen s/ Alimento</span>
+                            <span id="rent-margen" class="block text-lg font-extrabold mt-0.5 text-emerald-300">$0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================================================================== -->
+        <!-- MÓDULO 1: BASE DE DATOS DE INSUMOS                                  -->
+        <!-- =================================================================== -->
+        <section id="tab-insumos" class="tab-content hidden space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Base de Datos de Insumos</h2>
+                    <p class="text-sm text-slate-500 mt-1">Administra ingredientes, valores nutricionales y precios actuales ($/kg). Los cambios se guardan automáticamente.</p>
+                </div>
+                <button id="btn-open-add-modal" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-forest-900 hover:bg-forest-800 text-white text-sm font-semibold shadow-sm transition-colors">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    <span>Agregar Insumo</span>
+                </button>
+            </div>
+
+            <!-- Filtros y Búsqueda -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4 flex flex-col sm:flex-row gap-3">
+                <div class="relative flex-1">
+                    <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                    <input type="text" id="db-search" placeholder="Buscar insumo por nombre..." class="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-forest-600">
+                </div>
+                <select id="db-filter-cat" class="sm:w-56 rounded-xl border border-slate-300 px-3.5 py-2 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-forest-600">
+                    <option value="all">Todas las categorías</option>
+                    <option value="Grano/Energético">Grano/Energético</option>
+                    <option value="Subproducto">Subproducto</option>
+                    <option value="Proteico">Proteico</option>
+                    <option value="Forraje">Forraje</option>
+                    <option value="Energético/Aditivo">Energético/Aditivo</option>
+                    <option value="Nitrógeno No Proteico">Nitrógeno No Proteico</option>
+                    <option value="Mineral/Aditivo">Mineral/Aditivo</option>
+                </select>
+            </div>
+
+            <!-- Tabla de Insumos -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 text-[11px] font-semibold uppercase tracking-wider text-slate-500 border-b border-slate-200">
+                                <th class="py-3 px-4">Insumo</th>
+                                <th class="py-3 px-3">Categoría</th>
+                                <th class="py-3 px-3 text-right">Precio ($/kg)</th>
+                                <th class="py-3 px-3 text-right">PC %</th>
+                                <th class="py-3 px-3 text-right">ENg</th>
+                                <th class="py-3 px-3 text-right">ENm</th>
+                                <th class="py-3 px-3 text-right">MS %</th>
+                                <th class="py-3 px-3 text-right">FDN %</th>
+                                <th class="py-3 px-3 text-center">Límites %</th>
+                                <th class="py-3 px-4 text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="db-tbody" class="divide-y divide-slate-100 text-sm">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================================================================== -->
+        <!-- MÓDULO 3: INVENTARIO DE GANADO (PRÓXIMAMENTE)                       -->
+        <!-- =================================================================== -->
+        <section id="tab-inventario" class="tab-content hidden space-y-6">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-8 sm:p-12 text-center max-w-3xl mx-auto mt-6">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 mb-4">
+                    <i data-lucide="clock" class="w-3.5 h-3.5"></i> PRÓXIMAMENTE
+                </span>
+                <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">Inventario y Trazabilidad de Ganado</h2>
+                <p class="text-slate-500 mt-2 max-w-xl mx-auto text-sm">
+                    Muy pronto podrás llevar el control individual por arete SINIIGA, historial de pesajes, ganancia diaria real por lote y calendario sanitario.
+                </p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8 text-left">
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/70">
+                        <i data-lucide="baby" class="w-6 h-6 text-forest-700 mb-2"></i>
+                        <h4 class="font-semibold text-slate-900 text-sm">Nacimientos y Altas</h4>
+                        <p class="text-xs text-slate-500 mt-1">Registro de partos, genealogía, arete y peso al destete.</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/70">
+                        <i data-lucide="scale" class="w-6 h-6 text-forest-700 mb-2"></i>
+                        <h4 class="font-semibold text-slate-900 text-sm">Historial de Pesos</h4>
+                        <p class="text-xs text-slate-500 mt-1">Curvas de crecimiento y cálculo automático de GDP por animal.</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/70">
+                        <i data-lucide="syringe" class="w-6 h-6 text-forest-700 mb-2"></i>
+                        <h4 class="font-semibold text-slate-900 text-sm">Sanidad y Medicamentos</h4>
+                        <p class="text-xs text-slate-500 mt-1">Control de vacunas, desparasitantes, implantes y tiempos de retiro.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================================================================== -->
+        <!-- MÓDULO 4: GASTOS E INVERSIONES (PRÓXIMAMENTE)                       -->
+        <!-- =================================================================== -->
+        <section id="tab-gastos" class="tab-content hidden space-y-6">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-8 sm:p-12 text-center max-w-3xl mx-auto mt-6">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 mb-4">
+                    <i data-lucide="clock" class="w-3.5 h-3.5"></i> PRÓXIMAMENTE
+                </span>
+                <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">Control de Gastos e Inversiones</h2>
+                <p class="text-slate-500 mt-2 max-w-xl mx-auto text-sm">
+                    Centraliza las finanzas de tu rancho: compra de insumos, mano de obra, fletes y utilidad neta real por cada cabeza vendida.
+                </p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8 text-left">
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/70">
+                        <i data-lucide="receipt" class="w-6 h-6 text-forest-700 mb-2"></i>
+                        <h4 class="font-semibold text-slate-900 text-sm">Costos por Animal</h4>
+                        <p class="text-xs text-slate-500 mt-1">Prorrateo automático de alimento, medicina y gastos fijos por lote.</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/70">
+                        <i data-lucide="bar-chart-3" class="w-6 h-6 text-forest-700 mb-2"></i>
+                        <h4 class="font-semibold text-slate-900 text-sm">Flujo de Caja</h4>
+                        <p class="text-xs text-slate-500 mt-1">Seguimiento mensual de egresos, inversiones y ventas de ganado.</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-200/70">
+                        <i data-lucide="pie-chart" class="w-6 h-6 text-forest-700 mb-2"></i>
+                        <h4 class="font-semibold text-slate-900 text-sm">ROI del Rancho</h4>
+                        <p class="text-xs text-slate-500 mt-1">Reportes financieros listos para toma de decisiones y créditos.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- =================================================================== -->
+    <!-- MODAL: AGREGAR / EDITAR INSUMO                                      -->
+    <!-- =================================================================== -->
+    <div id="modal-insumo" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 no-print">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden">
+            <div class="px-6 py-4 bg-forest-900 text-white flex items-center justify-between">
+                <h3 id="modal-insumo-title" class="font-bold text-base">Agregar Nuevo Insumo</h3>
+                <button id="btn-close-modal" class="p-1 rounded-lg hover:bg-white/10 transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <form id="form-insumo" class="p-6 space-y-4">
+                <input type="hidden" id="inp-id">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Nombre del Insumo *</label>
+                        <input type="text" id="inp-nombre" required placeholder="Ej. Pollinaza, Harinolina..." class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-forest-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Categoría *</label>
+                        <select id="inp-categoria" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-forest-600">
+                            <option value="Grano/Energético">Grano/Energético</option>
+                            <option value="Subproducto">Subproducto</option>
+                            <option value="Proteico">Proteico</option>
+                            <option value="Forraje">Forraje</option>
+                            <option value="Energético/Aditivo">Energético/Aditivo</option>
+                            <option value="Nitrógeno No Proteico">Nitrógeno No Proteico</option>
+                            <option value="Mineral/Aditivo">Mineral/Aditivo</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Precio ($/Kg BH) *</label>
+                        <input type="number" id="inp-precio" required step="0.05" min="0" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-forest-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Proteína Cruda (% PC) *</label>
+                        <input type="number" id="inp-pc" required step="0.1" min="0" max="300" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-forest-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Materia Seca (% MS) *</label>
+                        <input type="number" id="inp-ms" required step="0.5" min="10" max="100" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-forest-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">ENg (Mcal/kg MS) *</label>
+                        <input type="number" id="inp-eng" required step="0.01" min="0" max="3" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-forest-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">ENm (Mcal/kg MS) *</label>
+                        <input type="number" id="inp-enm" required step="0.01" min="0" max="3.5" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-forest-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">FDN (% Fibra) *</label>
+                        <input type="number" id="inp-fdn" required step="0.5" min="0" max="100" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-forest-600">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Mín %</label>
+                            <input type="number" id="inp-min" required step="0.5" min="0" max="100" value="0" class="w-full rounded-xl border border-slate-300 px-2.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-forest-600">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Máx %</label>
+                            <input type="number" id="inp-max" required step="0.5" min="0" max="100" value="100" class="w-full rounded-xl border border-slate-300 px-2.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-forest-600">
+                        </div>
+                    </div>
+                </div>
+                <div class="pt-4 border-t border-slate-100 flex justify-end gap-2">
+                    <button type="button" id="btn-cancel-modal" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-50">Cancelar</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-forest-900 hover:bg-forest-800 text-white text-sm font-semibold shadow-sm">Guardar Insumo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- MODAL DE CONFIRMACIÓN PERSONALIZADO (Sin alert/confirm nativos)     -->
+    <!-- =================================================================== -->
+    <div id="modal-confirm" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 no-print">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6">
+            <h3 id="confirm-title" class="font-bold text-slate-900 text-base">Confirmar acción</h3>
+            <p id="confirm-message" class="text-sm text-slate-600 mt-2"></p>
+            <div class="mt-6 flex justify-end gap-2">
+                <button id="confirm-cancel" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-50">Cancelar</button>
+                <button id="confirm-ok" class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-sm font-semibold">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none no-print">
+        <div class="bg-slate-900 text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-2.5 text-sm font-medium">
+            <i data-lucide="check-circle-2" class="w-4 h-4 text-emerald-400"></i>
+            <span id="toast-msg">Guardado correctamente</span>
+        </div>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- JAVASCRIPT: LÓGICA, SIMPLEX DE DOS FASES, GRÁFICAS Y ESTADO         -->
+    <!-- =================================================================== -->
+    <script>
+        // -------------------------------------------------------------------
+        // 1. DATOS ORIGINALES PRECARGADOS (Exactos del Excel del usuario)
+        // -------------------------------------------------------------------
+        const DEFAULT_INGREDIENTS = [
+            { id: 1,  nombre: "Maíz rolado",       precio: 6.80,  pc: 8.5,   eng: 1.50, enm: 2.24, ms: 88,  fdn: 9.0,  categoria: "Grano/Energético",      min: 0,   max: 80,  activo: true, selected: true },
+            { id: 2,  nombre: "Maíz molido",       precio: 6.00,  pc: 8.5,   eng: 1.45, enm: 2.18, ms: 88,  fdn: 9.5,  categoria: "Grano/Energético",      min: 0,   max: 80,  activo: true, selected: true },
+            { id: 3,  nombre: "Sorgo molido",      precio: 5.30,  pc: 9.0,   eng: 1.35, enm: 2.00, ms: 90,  fdn: 11.0, categoria: "Grano/Energético",      min: 0,   max: 75,  activo: true, selected: true },
+            { id: 4,  nombre: "Afrecho de maíz",   precio: 5.80,  pc: 10.0,  eng: 1.35, enm: 1.98, ms: 90,  fdn: 25.0, categoria: "Subproducto",           min: 0,   max: 35,  activo: true, selected: true },
+            { id: 5,  nombre: "Salvado de trigo",  precio: 4.80,  pc: 15.0,  eng: 0.95, enm: 1.55, ms: 89,  fdn: 42.0, categoria: "Subproducto",           min: 0,   max: 25,  activo: true, selected: true },
+            { id: 6,  nombre: "Pasta de soya",     precio: 11.00, pc: 46.0,  eng: 1.30, enm: 1.96, ms: 89,  fdn: 14.0, categoria: "Proteico",              min: 0,   max: 25,  activo: true, selected: true },
+            { id: 7,  nombre: "Pasta de canola",   precio: 9.50,  pc: 36.0,  eng: 1.10, enm: 1.72, ms: 89,  fdn: 28.0, categoria: "Proteico",              min: 0,   max: 20,  activo: true, selected: true },
+            { id: 8,  nombre: "Heno de alfalfa",   precio: 5.50,  pc: 18.0,  eng: 0.65, enm: 1.25, ms: 90,  fdn: 44.0, categoria: "Forraje",               min: 0,   max: 100, activo: true, selected: true },
+            { id: 9,  nombre: "Rastrojo (paca)",   precio: 1.80,  pc: 4.5,   eng: 0.40, enm: 0.95, ms: 90,  fdn: 70.0, categoria: "Forraje",               min: 0,   max: 100, activo: true, selected: true },
+            { id: 10, nombre: "Melaza",            precio: 4.50,  pc: 4.0,   eng: 1.15, enm: 1.75, ms: 75,  fdn: 0.0,  categoria: "Energético/Aditivo",    min: 3,   max: 8,   activo: true, selected: true },
+            { id: 11, nombre: "Urea",              precio: 13.00, pc: 281.0, eng: 0.00, enm: 0.00, ms: 100, fdn: 0.0,  categoria: "Nitrógeno No Proteico", min: 0,   max: 1,   activo: true, selected: true },
+            { id: 12, nombre: "Minerales",         precio: 16.00, pc: 0.0,   eng: 0.00, enm: 0.00, ms: 100, fdn: 0.0,  categoria: "Mineral/Aditivo",       min: 2.5, max: 2.5, activo: true, selected: true }
+        ];
+
+        const STORAGE_KEY = 'ganadopro_ingredients_v1';
+
+        // Estado global de la aplicación
+        let ingredients = [];
+        let lastSolution = null;
+        let currentScale = '100ms'; // '100ms' | 'tonelada' | 'lote'
+        let chartComposition = null;
+        let chartCost = null;
+        let confirmCallback = null;
+
+        // -------------------------------------------------------------------
+        // 2. UTILIDADES Y PERSISTENCIA
+        // -------------------------------------------------------------------
+        function loadIngredients() {
+            try {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    if (Array.isArray(parsed) && parsed.length > 0) {
+                        ingredients = parsed;
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.error("Error cargando localStorage:", e);
+            }
+            ingredients = JSON.parse(JSON.stringify(DEFAULT_INGREDIENTS));
+            saveIngredients();
+        }
+
+        function saveIngredients() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(ingredients));
+            } catch (e) {
+                console.error("Error guardando localStorage:", e);
+            }
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').textContent = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2600);
+        }
+
+        function showConfirm(title, message, onOk) {
+            document.getElementById('confirm-title').textContent = title;
+            document.getElementById('confirm-message').textContent = message;
+            confirmCallback = onOk;
+            document.getElementById('modal-confirm').classList.remove('hidden');
+        }
+
+        function fmtMoney(val) {
+            return '$' + Number(val).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function fmtNum(val, dec = 2) {
+            return Number(val).toLocaleString('es-MX', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+        }
+
+        // -------------------------------------------------------------------
+        // 3. CÁLCULO DE REQUERIMIENTOS NUTRICIONALES (NRC / Mendoza & Ricalde)
+        // -------------------------------------------------------------------
+        function calculateRequirements() {
+            const proposito = document.getElementById('animal-proposito').value;
+            const sexo = document.getElementById('animal-sexo').value;
+            const raza = document.getElementById('animal-raza').value;
+            const peso = parseFloat(document.getElementById('animal-peso').value) || 320;
+            const gdp = parseFloat(document.getElementById('animal-gdp').value) || 1.5;
+            const leche = parseFloat(document.getElementById('animal-leche').value) || 22;
+            const temp = parseFloat(document.getElementById('animal-temp').value) || 28;
+            const implante = document.getElementById('animal-implante').checked;
+
+            // Mostrar/ocultar meta productiva según propósito
+            const contGdp = document.getElementById('container-meta-gdp');
+            const contLeche = document.getElementById('container-meta-leche');
+            if (proposito === 'lechero') {
+                contGdp.classList.add('hidden');
+                contLeche.classList.remove('hidden');
+            } else if (proposito === 'mantenimiento') {
+                contGdp.classList.add('hidden');
+                contLeche.classList.add('hidden');
+            } else {
+                contGdp.classList.remove('hidden');
+                contLeche.classList.add('hidden');
+            }
+
+            // 1. Consumo de Materia Seca (CMS) como % de Peso Vivo
+            let cmsPct = 2.6;
+            if (proposito === 'recepcion') cmsPct = 2.35;
+            else if (proposito === 'desarrollo') cmsPct = 2.65;
+            else if (proposito === 'finalizacion') cmsPct = 2.50;
+            else if (proposito === 'lechero') cmsPct = 2.2 + (leche * 0.055); // ~3.4% para 22L
+            else if (proposito === 'mantenimiento') cmsPct = 2.05;
+
+            // Ajustes por raza
+            if (raza === 'cebu') cmsPct *= 0.94;
+            else if (raza === 'lechero' && proposito !== 'lechero') cmsPct *= 1.06;
+
+            // Ajuste por implante anabólico (+4% CMS)
+            if (implante) cmsPct *= 1.04;
+
+            // Ajuste por estrés calórico / frío (Cap. XII)
+            if (temp > 30) cmsPct *= Math.max(0.85, 1 - (temp - 30) * 0.012);
+            else if (temp < 10) cmsPct *= Math.min(1.12, 1 + (10 - temp) * 0.008);
+
+            const cmsKg = Math.max(3, (peso * cmsPct) / 100);
+
+            // 2. Proteína Cruda (% PC), Energía (Mcal/kg MS) y Fibra (% FDN)
+            let pc = 13.0;
+            let en = 1.15;
+            let fdn = 22.0;
+            let enLabel = 'Energía de Ganancia (ENg)';
+            let nota = '';
+
+            if (proposito === 'recepcion') {
+                pc = 13.5 + (peso < 250 ? 1.0 : 0);
+                en = 0.95 + (gdp - 1.0) * 0.12;
+                fdn = 30.0;
+                nota = 'Etapa de Recepción: Prioriza la adaptación ruminal con al menos 30% de FDN (forraje de buena calidad) para evitar acidosis y timpanismo tras el transporte.';
+            } else if (proposito === 'desarrollo') {
+                pc = 12.8 + (gdp - 1.2) * 1.2;
+                en = 1.12 + (gdp - 1.2) * 0.16;
+                fdn = 22.0;
+                nota = 'Etapa de Desarrollo: Equilibrio entre crecimiento muscular (PC) y energía. Mantener FDN ≥ 20-22% asegura una fermentación ruminal estable.';
+            } else if (proposito === 'finalizacion') {
+                pc = 12.0 + (gdp - 1.4) * 0.8;
+                en = 1.28 + (gdp - 1.4) * 0.14;
+                fdn = 15.0;
+                nota = 'Etapa de Finalización: Alta densidad energética. Riesgo elevado de acidosis subaguda si la FDN baja de 15%; sirve la ración en 2 tomas diarias y vigila el comedero.';
+            } else if (proposito === 'lechero') {
+                enLabel = 'Energía Neta Mant./Prod. (ENm)';
+                pc = 14.5 + (leche - 15) * 0.15;
+                en = 1.55 + (leche - 15) * 0.018;
+                fdn = 30.0;
+                nota = 'Ganado Lechero: Requiere al menos 28-32% de FDN para mantener el porcentaje de grasa en leche y evitar desplazamiento de abomaso.';
+            } else {
+                enLabel = 'Energía Neta Mant. (ENm)';
+                pc = 9.0;
+                en = 1.20;
+                fdn = 36.0;
+                nota = 'Mantenimiento / Cría: Dieta económica basada en forrajes y subproductos. Asegúrate de cubrir minerales para fertilidad y condición corporal.';
+            }
+
+            // Ajustes por sexo e implante
+            if (sexo === 'macho_entero' && proposito !== 'mantenimiento' && proposito !== 'lechero') pc += 0.4;
+            if (implante) pc += 0.6;
+
+            // Límites razonables
+            pc = Math.min(20, Math.max(8, pc));
+            en = Math.min(proposito === 'lechero' ? 2.05 : 1.42, Math.max(0.70, en));
+
+            // Actualizar DOM
+            document.getElementById('req-cms').value = cmsKg.toFixed(2);
+            document.getElementById('req-cms-pct').textContent = `${cmsPct.toFixed(2)}% del Peso Vivo`;
+            document.getElementById('req-pc').value = pc.toFixed(1);
+            document.getElementById('req-en-label').textContent = enLabel;
+            document.getElementById('req-en').value = en.toFixed(2);
+            document.getElementById('req-fdn').value = fdn.toFixed(1);
+            document.getElementById('nota-tecnica-texto').textContent = nota;
+
+            // Sincronizar peso inicial en calculadora de rentabilidad
+            document.getElementById('rent-peso-ini').value = peso;
+            if (parseFloat(document.getElementById('rent-peso-fin').value) <= peso) {
+                document.getElementById('rent-peso-fin').value = peso + 180;
+            }
+        }
+
+        // -------------------------------------------------------------------
+        // 4. ALGORITMO SIMPLEX DE DOS FASES (PROGRAMACIÓN LINEAL EN JS PURO)
+        // -------------------------------------------------------------------
+        /**
+         * Resuelve el problema de formulación de dieta al costo mínimo:
+         * Minimizar sum( x_i * costoBS_i )
+         * Sujeto a:
+         *   sum(x_i) = 100
+         *   sum(x_i * pc_i) / 100 >= reqPC
+         *   sum(x_i * en_i) / 100 >= reqEN
+         *   sum(x_i * fdn_i) / 100 >= reqFDN
+         *   min_i <= x_i <= max_i
+         */
+        function solveDietLP(activeIngs, reqPC, reqEN, reqFDN, useENm) {
+            const EPS = 1e-7;
+
+            // Validaciones previas rápidas
+            if (activeIngs.length === 0) {
+                return { feasible: false, reason: "Debes seleccionar al menos un insumo en el Paso 2." };
+            }
+
+            let sumMin = 0;
+            let sumMax = 0;
+            for (const ing of activeIngs) {
+                if (ing.min > ing.max + EPS) {
+                    return { feasible: false, reason: `El insumo "${ing.nombre}" tiene un Mínimo (${ing.min}%) mayor que su Máximo (${ing.max}%).` };
+                }
+                sumMin += ing.min;
+                sumMax += ing.max;
+            }
+
+            if (sumMin > 100 + EPS) {
+                return { feasible: false, reason: `La suma de los límites mínimos (${sumMin.toFixed(1)}%) excede el 100% de la dieta.` };
+            }
+            if (sumMax < 100 - EPS) {
+                return { feasible: false, reason: `La suma de los límites máximos (${sumMax.toFixed(1)}%) no alcanza a cubrir el 100% de la dieta.` };
+            }
+
+            // Sustitución de variables: y_i = x_i - min_i  =>  0 <= y_i <= (max_i - min_i)
+            // Los insumos con min_i == max_i quedan fijos y se descuentan del RHS.
+            const freeIngs = [];
+            let fixedPC = 0, fixedEN = 0, fixedFDN = 0, fixedSum = 0;
+
+            for (const ing of activeIngs) {
+                const enVal = useENm ? ing.enm : ing.eng;
+                fixedSum += ing.min;
+                fixedPC  += ing.min * ing.pc;
+                fixedEN  += ing.min * enVal;
+                fixedFDN += ing.min * ing.fdn;
+
+                const upper = ing.max - ing.min;
+                if (upper > EPS) {
+                    freeIngs.push({
+                        ...ing,
+                        enVal: enVal,
+                        upper: upper,
+                        costBS: ing.precio / (ing.ms / 100) // Costo por kg de Materia Seca
+                    });
+                }
+            }
+
+            const remSum = 100 - fixedSum;
+            const remPC  = reqPC * 100 - fixedPC;
+            const remEN  = reqEN * 100 - fixedEN;
+            const remFDN = reqFDN * 100 - fixedFDN;
+
+            // Caso borde: todos los insumos están fijados (sumMin == 100)
+            if (freeIngs.length === 0) {
+                if (Math.abs(remSum) <= 1e-4 && remPC <= 1e-4 && remEN <= 1e-4 && remFDN <= 1e-4) {
+                    const sol = {};
+                    activeIngs.forEach(ing => sol[ing.id] = ing.min);
+                    return { feasible: true, solution: sol };
+                } else {
+                    return { feasible: false, reason: "Todos los insumos tienen límites fijos (Mín = Máx) y no cumplen con los requerimientos nutricionales." };
+                }
+            }
+
+            // Construcción de restricciones en forma estándar para y_0 ... y_{n-1}
+            // Tipos: 'EQ' (=), 'GE' (>=), 'LE' (<=)
+            const n = freeIngs.length;
+            const constraints = [];
+
+            // 1. Igualdad de suma: sum(y_i) = remSum
+            constraints.push({
+                coeffs: freeIngs.map(() => 1),
+                type: 'EQ',
+                rhs: Math.max(0, remSum)
+            });
+
+            // 2. Proteína Cruda: sum(y_i * pc_i) >= remPC (solo si remPC > 0)
+            if (remPC > EPS) {
+                constraints.push({
+                    coeffs: freeIngs.map(ing => ing.pc),
+                    type: 'GE',
+                    rhs: remPC
+                });
+            }
+
+            // 3. Energía: sum(y_i * en_i) >= remEN (solo si remEN > 0)
+            if (remEN > EPS) {
+                constraints.push({
+                    coeffs: freeIngs.map(ing => ing.enVal),
+                    type: 'GE',
+                    rhs: remEN
+                });
+            }
+
+            // 4. FDN: sum(y_i * fdn_i) >= remFDN (solo si remFDN > 0)
+            if (remFDN > EPS) {
+                constraints.push({
+                    coeffs: freeIngs.map(ing => ing.fdn),
+                    type: 'GE',
+                    rhs: remFDN
+                });
+            }
+
+            // 5. Cotas superiores: y_i <= upper_i (solo si upper_i < remSum)
+            for (let i = 0; i < n; i++) {
+                if (freeIngs[i].upper < remSum - EPS) {
+                    const row = new Array(n).fill(0);
+                    row[i] = 1;
+                    constraints.push({
+                        coeffs: row,
+                        type: 'LE',
+                        rhs: freeIngs[i].upper
+                    });
+                }
+            }
+
+            // Conteo de variables de holgura (slack/surplus) y artificiales
+            const m = constraints.length;
+            let numSlacks = 0;
+            let numArtificials = 0;
+            constraints.forEach(c => {
+                if (c.type === 'LE') numSlacks++;
+                else if (c.type === 'GE') { numSlacks++; numArtificials++; }
+                else if (c.type === 'EQ') { numArtificials++; }
+            });
+
+            const totalVars = n + numSlacks + numArtificials;
+            const rhsCol = totalVars;
+
+            // Tableau: m filas de restricciones + 1 fila objetivo (fila m)
+            const tableau = Array.from({ length: m + 1 }, () => new Array(totalVars + 1).fill(0));
+            const basis = new Array(m).fill(-1);
+            const isArtificial = new Array(totalVars).fill(false);
+
+            let slackIdx = n;
+            let artIdx = n + numSlacks;
+
+            for (let r = 0; r < m; r++) {
+                const c = constraints[r];
+                for (let j = 0; j < n; j++) {
+                    tableau[r][j] = c.coeffs[j];
+                }
+                tableau[r][rhsCol] = c.rhs;
+
+                if (c.type === 'LE') {
+                    tableau[r][slackIdx] = 1;
+                    basis[r] = slackIdx;
+                    slackIdx++;
+                } else if (c.type === 'GE') {
+                    tableau[r][slackIdx] = -1;
+                    slackIdx++;
+                    tableau[r][artIdx] = 1;
+                    isArtificial[artIdx] = true;
+                    basis[r] = artIdx;
+                    artIdx++;
+                } else if (c.type === 'EQ') {
+                    tableau[r][artIdx] = 1;
+                    isArtificial[artIdx] = true;
+                    basis[r] = artIdx;
+                    artIdx++;
+                }
+            }
+
+            // Función auxiliar de pivoteo
+            function pivot(pRow, pCol) {
+                const pVal = tableau[pRow][pCol];
+                for (let j = 0; j <= rhsCol; j++) {
+                    tableau[pRow][j] /= pVal;
+                }
+                for (let r = 0; r <= m; r++) {
+                    if (r === pRow) continue;
+                    const factor = tableau[r][pCol];
+                    if (Math.abs(factor) > 1e-12) {
+                        for (let j = 0; j <= rhsCol; j++) {
+                            tableau[r][j] -= factor * tableau[pRow][j];
+                        }
+                    }
+                }
+                basis[pRow] = pCol;
+            }
+
+            // Ejecutar iteraciones Simplex (Minimización: buscamos costo reducido < -EPS)
+            function runSimplex(maxCols) {
+                const MAX_ITER = 500;
+                for (let iter = 0; iter < MAX_ITER; iter++) {
+                    // Regla de Dantzig con desempate de Bland
+                    let enterCol = -1;
+                    let minVal = -EPS;
+                    for (let j = 0; j < maxCols; j++) {
+                        if (tableau[m][j] < minVal) {
+                            minVal = tableau[m][j];
+                            enterCol = j;
+                        }
+                    }
+                    if (enterCol === -1) return true; // Óptimo alcanzado
+
+                    // Prueba de razón mínima
+                    let leaveRow = -1;
+                    let minRatio = Infinity;
+                    for (let r = 0; r < m; r++) {
+                        const a = tableau[r][enterCol];
+                        if (a > EPS) {
+                            const ratio = tableau[r][rhsCol] / a;
+                            if (ratio < minRatio - 1e-9 || (Math.abs(ratio - minRatio) <= 1e-9 && basis[r] < basis[leaveRow])) {
+                                minRatio = ratio;
+                                leaveRow = r;
+                            }
+                        }
+                    }
+                    if (leaveRow === -1) return false; // No acotado
+                    pivot(leaveRow, enterCol);
+                }
+                return true;
+            }
+
+            // ---------------- FASE 1: Minimizar suma de artificiales ----------------
+            if (numArtificials > 0) {
+                for (let j = 0; j <= rhsCol; j++) tableau[m][j] = 0;
+                for (let j = n + numSlacks; j < totalVars; j++) {
+                    tableau[m][j] = 1;
+                }
+                // Eliminar variables artificiales básicas de la fila objetivo
+                for (let r = 0; r < m; r++) {
+                    if (isArtificial[basis[r]]) {
+                        for (let j = 0; j <= rhsCol; j++) {
+                            tableau[m][j] -= tableau[r][j];
+                        }
+                    }
+                }
+
+                runSimplex(totalVars);
+
+                // Si el valor objetivo de Fase 1 > 1e-4, el problema es INFACTIBLE
+                const phase1Obj = -tableau[m][rhsCol];
+                if (Math.abs(phase1Obj) > 1e-3) {
+                    return {
+                        feasible: false,
+                        reason: diagnoseInfeasibility(activeIngs, reqPC, reqEN, reqFDN, useENm)
+                    };
+                }
+
+                // Sacar variables artificiales degeneradas de la base si quedó alguna
+                for (let r = 0; r < m; r++) {
+                    if (isArtificial[basis[r]]) {
+                        for (let j = 0; j < n + numSlacks; j++) {
+                            if (Math.abs(tableau[r][j]) > EPS) {
+                                pivot(r, j);
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // ---------------- FASE 2: Minimizar costo real ----------------
+            for (let j = 0; j <= rhsCol; j++) tableau[m][j] = 0;
+            for (let j = 0; j < n; j++) {
+                tableau[m][j] = freeIngs[j].costBS;
+            }
+            // Eliminar variables básicas de la fila objetivo
+            for (let r = 0; r < m; r++) {
+                const bVar = basis[r];
+                if (bVar < n) {
+                    const cB = freeIngs[bVar].costBS;
+                    if (Math.abs(cB) > 1e-12) {
+                        for (let j = 0; j <= rhsCol; j++) {
+                            tableau[m][j] -= cB * tableau[r][j];
+                        }
+                    }
+                }
+            }
+
+            // Optimizar excluyendo columnas artificiales
+            runSimplex(n + numSlacks);
+
+            // Extraer solución final x_i = min_i + y_i
+            const solution = {};
+            activeIngs.forEach(ing => solution[ing.id] = ing.min);
+
+            for (let r = 0; r < m; r++) {
+                const bVar = basis[r];
+                if (bVar >= 0 && bVar < n) {
+                    const val = Math.max(0, tableau[r][rhsCol]);
+                    solution[freeIngs[bVar].id] += val;
+                }
+            }
+
+            return { feasible: true, solution };
+        }
+
+        // Diagnóstico amigable cuando el problema es infactible
+        function diagnoseInfeasibility(activeIngs, reqPC, reqEN, reqFDN, useENm) {
+            const maxPC  = Math.max(...activeIngs.map(i => i.pc));
+            const maxEN  = Math.max(...activeIngs.map(i => useENm ? i.enm : i.eng));
+            const maxFDN = Math.max(...activeIngs.map(i => i.fdn));
+
+            if (maxPC < reqPC) {
+                return `Ningún insumo seleccionado supera el ${reqPC}% de Proteína Cruda requerido (máximo disponible: ${maxPC}%). Activa Pasta de Soya, Canola o Urea.`;
+            }
+            if (maxEN < reqEN) {
+                return `Ningún insumo seleccionado alcanza la energía requerida de ${reqEN} Mcal/kg (máximo disponible: ${maxEN} Mcal/kg). Activa granos energéticos como Maíz o reduce la meta de ganancia diaria.`;
+            }
+            if (maxFDN < reqFDN) {
+                return `No es posible alcanzar el ${reqFDN}% de FDN mínima con los insumos actuales. Activa forrajes como Rastrojo o Heno de Alfalfa.`;
+            }
+            return `No es posible cumplir simultáneamente con Proteína (${reqPC}%), Energía (${reqEN} Mcal) y Fibra (${reqFDN}% FDN) bajo los límites Mín/Máx actuales. Intenta relajar algún tope máximo (ej. granos o forrajes) o reducir ligeramente la energía requerida.`;
+        }
+
+        // -------------------------------------------------------------------
+        // 5. RENDERIZADO DE TABLAS Y RESULTADOS
+        // -------------------------------------------------------------------
+        function renderSolverIngredientsTable() {
+            const tbody = document.getElementById('solver-ingredients-tbody');
+            const activeList = ingredients.filter(i => i.activo);
+
+            tbody.innerHTML = activeList.map(ing => `
+                <tr class="hover:bg-slate-50/80 transition-colors ${!ing.selected ? 'opacity-50' : ''}">
+                    <td class="py-2.5 px-3 text-center">
+                        <input type="checkbox" data-id="${ing.id}" class="solver-check w-4 h-4 rounded text-forest-700 focus:ring-forest-600 border-slate-300 cursor-pointer" ${ing.selected ? 'checked' : ''}>
+                    </td>
+                    <td class="py-2.5 px-3 font-medium text-slate-800">${ing.nombre}</td>
+                    <td class="py-2.5 px-3 hidden md:table-cell">
+                        <span class="text-[11px] font-medium px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">${ing.categoria}</span>
+                    </td>
+                    <td class="py-2.5 px-3 text-right font-semibold text-slate-900">${fmtMoney(ing.precio)}</td>
+                    <td class="py-2.5 px-3 text-right text-slate-600 hidden sm:table-cell">${ing.pc.toFixed(1)}%</td>
+                    <td class="py-2.5 px-3 text-right text-slate-600 hidden sm:table-cell">${ing.eng.toFixed(2)} / ${ing.enm.toFixed(2)}</td>
+                    <td class="py-2.5 px-3 text-right text-slate-600 hidden lg:table-cell">${ing.fdn.toFixed(1)}%</td>
+                    <td class="py-2.5 px-2 text-center">
+                        <input type="number" data-id="${ing.id}" data-field="min" value="${ing.min}" min="0" max="100" step="0.5"
+                            class="solver-limit w-16 text-center rounded-lg border border-slate-300 py-1 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-forest-600">
+                    </td>
+                    <td class="py-2.5 px-2 text-center">
+                        <input type="number" data-id="${ing.id}" data-field="max" value="${ing.max}" min="0" max="100" step="0.5"
+                            class="solver-limit w-16 text-center rounded-lg border border-slate-300 py-1 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-forest-600">
+                    </td>
+                </tr>
+            `).join('');
+
+            // Event listeners
+            tbody.querySelectorAll('.solver-check').forEach(chk => {
+                chk.addEventListener('change', (e) => {
+                    const id = Number(e.target.dataset.id);
+                    const ing = ingredients.find(i => i.id === id);
+                    if (ing) {
+                        ing.selected = e.target.checked;
+                        saveIngredients();
+                        renderSolverIngredientsTable();
+                    }
+                });
+            });
+
+            tbody.querySelectorAll('.solver-limit').forEach(inp => {
+                inp.addEventListener('change', (e) => {
+                    const id = Number(e.target.dataset.id);
+                    const field = e.target.dataset.field;
+                    const val = Math.max(0, Math.min(100, parseFloat(e.target.value) || 0));
+                    const ing = ingredients.find(i => i.id === id);
+                    if (ing) {
+                        ing[field] = val;
+                        saveIngredients();
+                    }
+                });
+            });
+        }
+
+        function executeSolver() {
+            const proposito = document.getElementById('animal-proposito').value;
+            const useENm = (proposito === 'lechero' || proposito === 'mantenimiento');
+            const reqPC  = parseFloat(document.getElementById('req-pc').value) || 13.0;
+            const reqEN  = parseFloat(document.getElementById('req-en').value) || 1.15;
+            const reqFDN = parseFloat(document.getElementById('req-fdn').value) || 20.0;
+            const cmsKg  = parseFloat(document.getElementById('req-cms').value) || 8.5;
+
+            const selectedIngs = ingredients.filter(i => i.activo && i.selected);
+            const res = solveDietLP(selectedIngs, reqPC, reqEN, reqFDN, useENm);
+
+            const errBox = document.getElementById('solver-error-box');
+            const resSec = document.getElementById('results-section');
+
+            if (!res.feasible) {
+                errBox.classList.remove('hidden');
+                document.getElementById('solver-error-msg').textContent = res.reason;
+                resSec.classList.add('hidden');
+                errBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+
+            errBox.classList.add('hidden');
+            resSec.classList.remove('hidden');
+
+            // Calcular métricas base (por 100 kg de MS)
+            let items = [];
+            let totalKgBH_100MS = 0;
+            let totalCost_100MS = 0;
+            let achievedPC = 0;
+            let achievedEN = 0;
+            let achievedFDN = 0;
+
+            selectedIngs.forEach(ing => {
+                const pctBS = res.solution[ing.id] || 0;
+                if (pctBS > 0.005) {
+                    const kgBH = pctBS / (ing.ms / 100);
+                    const cost = kgBH * ing.precio;
+                    totalKgBH_100MS += kgBH;
+                    totalCost_100MS += cost;
+                    achievedPC  += (pctBS * ing.pc) / 100;
+                    achievedEN  += (pctBS * (useENm ? ing.enm : ing.eng)) / 100;
+                    achievedFDN += (pctBS * ing.fdn) / 100;
+
+                    items.push({
+                        ...ing,
+                        pctBS,
+                        kgBH_100MS: kgBH,
+                        cost_100MS: cost
+                    });
+                }
+            });
+
+            // Ordenar de mayor a menor inclusión
+            items.sort((a, b) => b.pctBS - a.pctBS);
+
+            lastSolution = {
+                items,
+                totalKgBH_100MS,
+                totalCost_100MS,
+                achievedPC,
+                achievedEN,
+                achievedFDN,
+                reqPC,
+                reqEN,
+                reqFDN,
+                cmsKg,
+                useENm,
+                msDietaPct: (100 / totalKgBH_100MS) * 100
+            };
+
+            renderResults();
+            resSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function renderResults() {
+            if (!lastSolution) return;
+            const s = lastSolution;
+
+            // Costos unitarios
+            const costPerKgBH = s.totalCost_100MS / s.totalKgBH_100MS;
+            const costPerTonBH = costPerKgBH * 1000;
+            const kgBHPerAnimalDay = s.cmsKg / (s.msDietaPct / 100);
+            const costPerAnimalDay = kgBHPerAnimalDay * costPerKgBH;
+
+            // KPIs
+            document.getElementById('kpi-costo-kg').textContent = fmtMoney(costPerKgBH);
+            document.getElementById('kpi-costo-ton').textContent = `${fmtMoney(costPerTonBH)} / Tonelada`;
+            document.getElementById('kpi-costo-dia').textContent = fmtMoney(costPerAnimalDay);
+            document.getElementById('kpi-costo-mes').textContent = `${fmtMoney(costPerAnimalDay * 30)} / mes por cabeza`;
+            document.getElementById('kpi-kg-servir').textContent = `${fmtNum(kgBHPerAnimalDay, 2)} kg`;
+            document.getElementById('kpi-ms-agua').textContent = `MS: ${fmtNum(s.msDietaPct, 1)}% | Agua: ${fmtNum(100 - s.msDietaPct, 1)}%`;
+
+            document.getElementById('kpi-pc-val').textContent = `${fmtNum(s.achievedPC, 2)}% (Req: ${s.reqPC}%)`;
+            document.getElementById('kpi-en-label').textContent = s.useENm ? 'ENm Lograda:' : 'ENg Lograda:';
+            document.getElementById('kpi-en-val').textContent = `${fmtNum(s.achievedEN, 2)} Mcal (Req: ${s.reqEN})`;
+            document.getElementById('kpi-fdn-val').textContent = `${fmtNum(s.achievedFDN, 1)}% (Req: ${s.reqFDN}%)`;
+
+            // Factor de escala
+            let scaleFactor = 1;
+            let subtitle = 'Mostrando cantidades para 100 kg de Materia Seca (Estándar)';
+            if (currentScale === 'tonelada') {
+                scaleFactor = 1000 / s.totalKgBH_100MS;
+                subtitle = 'Mostrando cantidades para preparar 1 Tonelada (1,000 kg servidos en Base Húmeda)';
+            } else if (currentScale === 'lote') {
+                const cabezas = Math.max(1, parseInt(document.getElementById('lote-cabezas').value) || 30);
+                const totalLoteMS = cabezas * s.cmsKg;
+                scaleFactor = totalLoteMS / 100;
+                subtitle = `Ración diaria total para tu lote de ${cabezas} cabezas (${fmtNum(totalLoteMS, 1)} kg MS/día)`;
+            }
+            document.getElementById('tabla-escala-subtitulo').textContent = subtitle;
+
+            // Tabla de resultados
+            const tbody = document.getElementById('results-tbody');
+            let sumPct = 0, sumKgBH = 0, sumCost = 0;
+
+            tbody.innerHTML = s.items.map(item => {
+                const kgBH = item.kgBH_100MS * scaleFactor;
+                const cost = item.cost_100MS * scaleFactor;
+                sumPct += item.pctBS;
+                sumKgBH += kgBH;
+                sumCost += cost;
+                return `
+                    <tr class="hover:bg-slate-50/80">
+                        <td class="py-3 px-4 font-semibold text-slate-800">${item.nombre}</td>
+                        <td class="py-3 px-4 text-right text-slate-700">${fmtNum(item.pctBS, 2)}%</td>
+                        <td class="py-3 px-4 text-right font-bold text-forest-900">${fmtNum(kgBH, 2)} kg</td>
+                        <td class="py-3 px-4 text-right text-slate-600">${fmtMoney(item.precio)}</td>
+                        <td class="py-3 px-4 text-right font-semibold text-slate-900">${fmtMoney(cost)}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('results-tfoot').innerHTML = `
+                <tr>
+                    <td class="py-3.5 px-4">TOTAL MEZCLA</td>
+                    <td class="py-3.5 px-4 text-right">${fmtNum(sumPct, 1)}%</td>
+                    <td class="py-3.5 px-4 text-right text-forest-900">${fmtNum(sumKgBH, 2)} kg</td>
+                    <td class="py-3.5 px-4 text-right text-xs font-medium text-slate-500">Prom: ${fmtMoney(sumCost / sumKgBH)}/kg</td>
+                    <td class="py-3.5 px-4 text-right text-forest-900 text-base">${fmtMoney(sumCost)}</td>
+                </tr>
+            `;
+
+            renderCharts(s.items, scaleFactor);
+            updateRentabilidad(costPerAnimalDay);
+        }
+
+        function renderCharts(items, scaleFactor) {
+            const labels = items.map(i => i.nombre);
+            const dataPct = items.map(i => Number(i.pctBS.toFixed(2)));
+            const dataCost = items.map(i => Number((i.cost_100MS * scaleFactor).toFixed(2)));
+
+            const palette = [
+                '#1B4332', '#2D6A4F', '#40916C', '#52B788', '#74C69D',
+                '#D97706', '#F59E0B', '#0284C7', '#6366F1', '#64748B'
+            ];
+
+            if (chartComposition) chartComposition.destroy();
+            if (chartCost) chartCost.destroy();
+
+            const ctx1 = document.getElementById('chart-composition').getContext('2d');
+            chartComposition = new Chart(ctx1, {
+                type: 'doughnut',
+                data: {
+                    labels,
+                    datasets: [{
+                        data: dataPct,
+                        backgroundColor: palette.slice(0, items.length),
+                        borderWidth: 2,
+                        borderColor: '#FFFFFF'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right', labels: { boxWidth: 12, font: { family: 'Inter', size: 11 } } },
+                        tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw}% BS` } }
+                    }
+                }
+            });
+
+            const ctx2 = document.getElementById('chart-cost').getContext('2d');
+            chartCost = new Chart(ctx2, {
+                type: 'bar',
+                data: {
+                    labels,
+                    datasets: [{
+                        label: 'Costo ($ MXN)',
+                        data: dataCost,
+                        backgroundColor: '#2D6A4F',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: { callbacks: { label: ctx => ` ${fmtMoney(ctx.raw)}` } }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, grid: { color: '#F1F5F9' }, ticks: { callback: v => '$' + v, font: { size: 11 } } },
+                        x: { grid: { display: false }, ticks: { font: { size: 11 } } }
+                    }
+                }
+            });
+        }
+
+        function updateRentabilidad(costPerAnimalDay) {
+            if (!lastSolution) return;
+            const s = lastSolution;
+            const costDay = costPerAnimalDay !== undefined
+                ? costPerAnimalDay
+                : (s.cmsKg / (s.msDietaPct / 100)) * (s.totalCost_100MS / s.totalKgBH_100MS);
+
+            const pesoIni = parseFloat(document.getElementById('rent-peso-ini').value) || 320;
+            const pesoFin = parseFloat(document.getElementById('rent-peso-fin').value) || 520;
+            const precioPie = parseFloat(document.getElementById('rent-precio-pie').value) || 75;
+            const gdp = parseFloat(document.getElementById('animal-gdp').value) || 1.5;
+
+            const kgGanar = Math.max(0, pesoFin - pesoIni);
+            const dias = gdp > 0 ? Math.ceil(kgGanar / gdp) : 0;
+            const gastoAlim = dias * costDay;
+            const ingreso = kgGanar * precioPie;
+            const margen = ingreso - gastoAlim;
+
+            document.getElementById('rent-kg-ganar').textContent = `${fmtNum(kgGanar, 0)} kg`;
+            document.getElementById('rent-dias').textContent = `${dias} días`;
+            document.getElementById('rent-gasto-alim').textContent = fmtMoney(gastoAlim);
+            document.getElementById('rent-ingreso').textContent = fmtMoney(ingreso);
+            document.getElementById('rent-margen').textContent = fmtMoney(margen);
+        }
+
+        // -------------------------------------------------------------------
+        // 6. MÓDULO BASE DE DATOS DE INSUMOS (CRUD)
+        // -------------------------------------------------------------------
+        function renderDatabaseTable() {
+            const tbody = document.getElementById('db-tbody');
+            const query = document.getElementById('db-search').value.toLowerCase().trim();
+            const catFilter = document.getElementById('db-filter-cat').value;
+
+            const filtered = ingredients.filter(ing => {
+                const matchName = ing.nombre.toLowerCase().includes(query);
+                const matchCat = (catFilter === 'all' || ing.categoria === catFilter);
+                return matchName && matchCat;
+            });
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="10" class="py-8 text-center text-slate-400 text-sm">No se encontraron insumos con esos filtros.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = filtered.map(ing => `
+                <tr class="hover:bg-slate-50/80 transition-colors ${!ing.activo ? 'opacity-50 bg-slate-50' : ''}">
+                    <td class="py-3 px-4 font-semibold text-slate-900">${ing.nombre}</td>
+                    <td class="py-3 px-3">
+                        <span class="text-[11px] font-medium px-2 py-0.5 rounded-md bg-slate-100 text-slate-600">${ing.categoria}</span>
+                    </td>
+                    <td class="py-3 px-3 text-right">
+                        <div class="inline-flex items-center bg-forest-50/70 border border-forest-200 rounded-lg px-2 py-0.5">
+                            <span class="text-xs text-forest-700 mr-0.5">$</span>
+                            <input type="number" data-id="${ing.id}" value="${ing.precio.toFixed(2)}" step="0.10" min="0"
+                                class="db-inline-price w-14 text-right bg-transparent text-sm font-bold text-forest-900 focus:outline-none">
+                        </div>
+                    </td>
+                    <td class="py-3 px-3 text-right text-slate-700">${ing.pc.toFixed(1)}%</td>
+                    <td class="py-3 px-3 text-right text-slate-700">${ing.eng.toFixed(2)}</td>
+                    <td class="py-3 px-3 text-right text-slate-700">${ing.enm.toFixed(2)}</td>
+                    <td class="py-3 px-3 text-right text-slate-700">${ing.ms.toFixed(0)}%</td>
+                    <td class="py-3 px-3 text-right text-slate-700">${ing.fdn.toFixed(1)}%</td>
+                    <td class="py-3 px-3 text-center text-xs text-slate-600">${ing.min}% - ${ing.max}%</td>
+                    <td class="py-3 px-4 text-center">
+                        <div class="inline-flex items-center gap-1">
+                            <button data-id="${ing.id}" class="btn-edit-ing p-1.5 rounded-lg hover:bg-slate-200 text-slate-600 transition-colors" title="Editar">
+                                <i data-lucide="pencil" class="w-4 h-4"></i>
+                            </button>
+                            <button data-id="${ing.id}" class="btn-toggle-ing p-1.5 rounded-lg hover:bg-slate-200 text-slate-600 transition-colors" title="${ing.activo ? 'Desactivar' : 'Activar'}">
+                                <i data-lucide="${ing.activo ? 'eye' : 'eye-off'}" class="w-4 h-4"></i>
+                            </button>
+                            <button data-id="${ing.id}" class="btn-del-ing p-1.5 rounded-lg hover:bg-red-100 text-red-600 transition-colors" title="Eliminar">
+                                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+
+            lucide.createIcons();
+
+            // Edición directa de precio $/kg
+            tbody.querySelectorAll('.db-inline-price').forEach(inp => {
+                inp.addEventListener('change', (e) => {
+                    const id = Number(e.target.dataset.id);
+                    const val = Math.max(0, parseFloat(e.target.value) || 0);
+                    const ing = ingredients.find(i => i.id === id);
+                    if (ing) {
+                        ing.precio = val;
+                        saveIngredients();
+                        renderSolverIngredientsTable();
+                        showToast(`Precio de ${ing.nombre} actualizado a ${fmtMoney(val)}`);
+                    }
+                });
+            });
+
+            // Botón Editar Modal
+            tbody.querySelectorAll('.btn-edit-ing').forEach(btn => {
+                btn.addEventListener('click', () => openInsumoModal(Number(btn.dataset.id)));
+            });
+
+            // Botón Activar/Desactivar
+            tbody.querySelectorAll('.btn-toggle-ing').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const ing = ingredients.find(i => i.id === Number(btn.dataset.id));
+                    if (ing) {
+                        ing.activo = !ing.activo;
+                        saveIngredients();
+                        renderDatabaseTable();
+                        renderSolverIngredientsTable();
+                    }
+                });
+            });
+
+            // Botón Eliminar
+            tbody.querySelectorAll('.btn-del-ing').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const id = Number(btn.dataset.id);
+                    const ing = ingredients.find(i => i.id === id);
+                    if (!ing) return;
+                    showConfirm('Eliminar Insumo', `¿Seguro que deseas eliminar "${ing.nombre}" de la base de datos?`, () => {
+                        ingredients = ingredients.filter(i => i.id !== id);
+                        saveIngredients();
+                        renderDatabaseTable();
+                        renderSolverIngredientsTable();
+                        showToast('Insumo eliminado');
+                    });
+                });
+            });
+        }
+
+        function openInsumoModal(id = null) {
+            const modal = document.getElementById('modal-insumo');
+            const title = document.getElementById('modal-insumo-title');
+            const form = document.getElementById('form-insumo');
+            form.reset();
+
+            if (id) {
+                const ing = ingredients.find(i => i.id === id);
+                if (!ing) return;
+                title.textContent = 'Editar Insumo';
+                document.getElementById('inp-id').value = ing.id;
+                document.getElementById('inp-nombre').value = ing.nombre;
+                document.getElementById('inp-categoria').value = ing.categoria;
+                document.getElementById('inp-precio').value = ing.precio;
+                document.getElementById('inp-pc').value = ing.pc;
+                document.getElementById('inp-ms').value = ing.ms;
+                document.getElementById('inp-eng').value = ing.eng;
+                document.getElementById('inp-enm').value = ing.enm;
+                document.getElementById('inp-fdn').value = ing.fdn;
+                document.getElementById('inp-min').value = ing.min;
+                document.getElementById('inp-max').value = ing.max;
+            } else {
+                title.textContent = 'Agregar Nuevo Insumo';
+                document.getElementById('inp-id').value = '';
+                document.getElementById('inp-ms').value = 89;
+            }
+            modal.classList.remove('hidden');
+        }
+
+        function exportCSV() {
+            if (!lastSolution) return;
+            const s = lastSolution;
+            let scaleFactor = 1;
+            if (currentScale === 'tonelada') scaleFactor = 1000 / s.totalKgBH_100MS;
+            else if (currentScale === 'lote') {
+                const cabezas = Math.max(1, parseInt(document.getElementById('lote-cabezas').value) || 30);
+                scaleFactor = (cabezas * s.cmsKg) / 100;
+            }
+
+            let csv = 'Insumo,% Base Seca,Kilos a Servir (BH),Precio ($/kg),Costo Real ($)\n';
+            s.items.forEach(item => {
+                csv += `"${item.nombre}",${item.pctBS.toFixed(2)},${(item.kgBH_100MS * scaleFactor).toFixed(2)},${item.precio.toFixed(2)},${(item.cost_100MS * scaleFactor).toFixed(2)}\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `GanadoPro_Receta_${new Date().toISOString().slice(0,10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Receta exportada en CSV');
+        }
+
+        // -------------------------------------------------------------------
+        // 7. NAVEGACIÓN Y EVENTOS INICIALES
+        // -------------------------------------------------------------------
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(sec => sec.classList.add('hidden'));
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if (btn.dataset.tab === tabName) {
+                    btn.classList.add('bg-forest-700', 'text-white', 'shadow-sm');
+                    btn.classList.remove('text-forest-100/80', 'text-forest-100/70');
+                } else {
+                    btn.classList.remove('bg-forest-700', 'text-white', 'shadow-sm');
+                    btn.classList.add('text-forest-100/80');
+                }
+            });
+
+            // Cerrar sidebar en móvil
+            document.getElementById('sidebar').classList.add('-translate-x-full');
+            document.getElementById('sidebar-backdrop').classList.add('hidden');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadIngredients();
+            calculateRequirements();
+            renderSolverIngredientsTable();
+            renderDatabaseTable();
+            lucide.createIcons();
+
+            // Navegación
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+            });
+            document.getElementById('btn-goto-db').addEventListener('click', () => switchTab('insumos'));
+
+            // Mobile menu
+            document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.remove('-translate-x-full');
+                document.getElementById('sidebar-backdrop').classList.remove('hidden');
+            });
+            const closeMobile = () => {
+                document.getElementById('sidebar').classList.add('-translate-x-full');
+                document.getElementById('sidebar-backdrop').classList.add('hidden');
+            };
+            document.getElementById('close-sidebar-btn').addEventListener('click', closeMobile);
+            document.getElementById('sidebar-backdrop').addEventListener('click', closeMobile);
+
+            // Recálculo automático de requerimientos al cambiar perfil
+            ['animal-proposito', 'animal-sexo', 'animal-raza', 'animal-peso', 'animal-edad', 'animal-gdp', 'animal-leche', 'animal-temp', 'animal-implante'].forEach(id => {
+                document.getElementById(id).addEventListener('change', calculateRequirements);
+            });
+            document.getElementById('btn-recalc-req').addEventListener('click', () => {
+                calculateRequirements();
+                showToast('Requerimientos recalculados automáticamente');
+            });
+
+            // Seleccionar todos los insumos
+            document.getElementById('btn-select-all-ing').addEventListener('click', () => {
+                ingredients.forEach(i => { if (i.activo) i.selected = true; });
+                saveIngredients();
+                renderSolverIngredientsTable();
+            });
+
+            // Ejecutar Solver
+            document.getElementById('btn-run-solver').addEventListener('click', executeSolver);
+
+            // Escalas de mezcla
+            document.querySelectorAll('.scale-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    currentScale = btn.dataset.scale;
+                    document.querySelectorAll('.scale-btn').forEach(b => {
+                        b.classList.remove('bg-white', 'text-forest-900', 'shadow-sm');
+                        b.classList.add('text-slate-600');
+                    });
+                    btn.classList.add('bg-white', 'text-forest-900', 'shadow-sm');
+                    btn.classList.remove('text-slate-600');
+
+                    const loteBox = document.getElementById('lote-input-container');
+                    if (currentScale === 'lote') loteBox.classList.remove('hidden');
+                    else loteBox.classList.add('hidden');
+
+                    renderResults();
+                });
+            });
+            document.getElementById('lote-cabezas').addEventListener('input', renderResults);
+
+            // Calculadora de rentabilidad
+            ['rent-peso-ini', 'rent-peso-fin', 'rent-precio-pie'].forEach(id => {
+                document.getElementById(id).addEventListener('input', () => updateRentabilidad());
+            });
+
+            // Exportar e Imprimir
+            document.getElementById('btn-export-csv').addEventListener('click', exportCSV);
+            document.getElementById('btn-print-recipe').addEventListener('click', () => window.print());
+
+            // Base de Datos: búsqueda y filtros
+            document.getElementById('db-search').addEventListener('input', renderDatabaseTable);
+            document.getElementById('db-filter-cat').addEventListener('change', renderDatabaseTable);
+
+            // Modal Insumo
+            document.getElementById('btn-open-add-modal').addEventListener('click', () => openInsumoModal());
+            const closeModal = () => document.getElementById('modal-insumo').classList.add('hidden');
+            document.getElementById('btn-close-modal').addEventListener('click', closeModal);
+            document.getElementById('btn-cancel-modal').addEventListener('click', closeModal);
+
+            document.getElementById('form-insumo').addEventListener('submit', (e) => {
+                e.preventDefault();
+                const idVal = document.getElementById('inp-id').value;
+                const data = {
+                    nombre: document.getElementById('inp-nombre').value.trim(),
+                    categoria: document.getElementById('inp-categoria').value,
+                    precio: parseFloat(document.getElementById('inp-precio').value) || 0,
+                    pc: parseFloat(document.getElementById('inp-pc').value) || 0,
+                    ms: parseFloat(document.getElementById('inp-ms').value) || 90,
+                    eng: parseFloat(document.getElementById('inp-eng').value) || 0,
+                    enm: parseFloat(document.getElementById('inp-enm').value) || 0,
+                    fdn: parseFloat(document.getElementById('inp-fdn').value) || 0,
+                    min: parseFloat(document.getElementById('inp-min').value) || 0,
+                    max: parseFloat(document.getElementById('inp-max').value) || 100,
+                };
+
+                if (idVal) {
+                    const idx = ingredients.findIndex(i => i.id === Number(idVal));
+                    if (idx !== -1) {
+                        ingredients[idx] = { ...ingredients[idx], ...data };
+                    }
+                    showToast('Insumo actualizado');
+                } else {
+                    const newId = ingredients.length ? Math.max(...ingredients.map(i => i.id)) + 1 : 1;
+                    ingredients.push({ id: newId, ...data, activo: true, selected: true });
+                    showToast('Nuevo insumo agregado');
+                }
+                saveIngredients();
+                renderDatabaseTable();
+                renderSolverIngredientsTable();
+                closeModal();
+            });
+
+            // Modal Confirmación
+            document.getElementById('confirm-cancel').addEventListener('click', () => {
+                document.getElementById('modal-confirm').classList.add('hidden');
+            });
+            document.getElementById('confirm-ok').addEventListener('click', () => {
+                document.getElementById('modal-confirm').classList.add('hidden');
+                if (confirmCallback) confirmCallback();
+            });
+
+            // Restaurar datos originales
+            document.getElementById('btn-reset-data').addEventListener('click', () => {
+                showConfirm(
+                    'Restaurar datos originales',
+                    'Se restablecerán los 12 insumos y precios originales de tu Excel. ¿Deseas continuar?',
+                    () => {
+                        ingredients = JSON.parse(JSON.stringify(DEFAULT_INGREDIENTS));
+                        saveIngredients();
+                        renderDatabaseTable();
+                        renderSolverIngredientsTable();
+                        showToast('Datos originales restaurados');
+                    }
+                );
+            });
+        });
+    </script>
+</body>
+</html>
