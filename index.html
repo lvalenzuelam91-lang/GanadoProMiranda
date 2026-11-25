@@ -653,6 +653,381 @@
         <!-- =================================================================== -->
         <!-- MÓDULO 1: BASE DE DATOS DE INSUMOS                                  -->
         <!-- =================================================================== -->
+        <section id="tab-insumos" class="tab-content hidden space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Base de Datos de Insumos</h2>
+                    <p class="text-sm text-slate-500 mt-1">Edita precios ($/kg) directamente en la tabla o agrega nuevos ingredientes. Se sincroniza en la nube al instante.</p>
+                </div>
+                <button id="btn-open-add-modal" class="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-forest-900 hover:bg-forest-800 text-white text-sm font-semibold shadow-sm transition-colors">
+                    <i data-lucide="plus" class="w-4 h-4"></i>
+                    <span>Agregar Insumo</span>
+                </button>
+            </div>
+
+            <!-- Filtros y Búsqueda -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4 flex flex-col sm:flex-row gap-3 justify-between">
+                <div class="relative flex-1 max-w-md">
+                    <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2"></i>
+                    <input type="text" id="db-search" placeholder="Buscar insumo por nombre..." class="w-full pl-10 pr-4 py-2 rounded-xl border border-slate-300 text-sm focus:outline-none focus:ring-2 focus:ring-forest-600">
+                </div>
+                <div class="flex items-center gap-2">
+                    <select id="db-category-filter" class="rounded-xl border border-slate-300 px-3.5 py-2 text-sm text-slate-700 bg-white focus:outline-none focus:ring-2 focus:ring-forest-600">
+                        <option value="all">Todas las categorías</option>
+                        <option value="Grano/Energético">Grano/Energético</option>
+                        <option value="Subproducto">Subproducto</option>
+                        <option value="Proteico">Proteico</option>
+                        <option value="Forraje">Forraje</option>
+                        <option value="Energético/Aditivo">Energético/Aditivo</option>
+                        <option value="Nitrógeno No Proteico">Nitrógeno No Proteico</option>
+                        <option value="Mineral/Aditivo">Mineral/Aditivo</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Tabla Completa de Insumos -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                                <th class="py-3.5 px-4">Insumo</th>
+                                <th class="py-3.5 px-4">Categoría</th>
+                                <th class="py-3.5 px-4 text-right">Precio ($/kg)</th>
+                                <th class="py-3.5 px-4 text-right">% PC</th>
+                                <th class="py-3.5 px-4 text-right">ENg (Mcal)</th>
+                                <th class="py-3.5 px-4 text-right">ENm (Mcal)</th>
+                                <th class="py-3.5 px-4 text-right">% MS</th>
+                                <th class="py-3.5 px-4 text-right">% FDN</th>
+                                <th class="py-3.5 px-4 text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="db-ingredients-tbody" class="divide-y divide-slate-100 text-sm">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================================================================== -->
+        <!-- MÓDULO 3: PASTOREO ROTATIVO (46 CUADROS EN ESPEJO)                  -->
+        <!-- =================================================================== -->
+        <section id="tab-pastoreo" class="tab-content hidden space-y-6">
+            <!-- Header -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Diseño de Cercado y Pastoreo Rotativo</h2>
+                    <p id="pastoreo-predio-desc" class="text-sm text-slate-500 mt-1">Predio 423 m × 127 m • Callejón Central 3 m • 46 Cuadros de 18.4 m × 62 m (1,140 m² c/u)</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 no-print">
+                    <button id="btn-export-pastoreo" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors">
+                        <i data-lucide="download" class="w-4 h-4"></i>
+                        <span>Exportar CSV</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- KPIs de Rotación -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200/80">
+                    <span class="text-xs font-semibold text-slate-500">Cuadro Activo Hoy</span>
+                    <div id="pastoreo-kpi-activo" class="text-2xl font-extrabold text-blue-700 mt-1">Cuadro #1</div>
+                    <p id="pastoreo-kpi-activo-sub" class="text-xs text-slate-500 mt-1">Franja Norte • En pastoreo</p>
+                </div>
+
+                <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200/80">
+                    <span class="text-xs font-semibold text-slate-500">Siguiente Sugerido</span>
+                    <div id="pastoreo-kpi-siguiente" class="text-2xl font-extrabold text-emerald-700 mt-1">Cuadro #2</div>
+                    <p id="pastoreo-kpi-siguiente-sub" class="text-xs text-slate-500 mt-1">Mayor tiempo de descanso</p>
+                </div>
+
+                <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200/80">
+                    <span class="text-xs font-semibold text-slate-500">Listos para Entrar</span>
+                    <div id="pastoreo-kpi-listos" class="text-2xl font-extrabold text-forest-900 mt-1">0 / 46</div>
+                    <p id="pastoreo-kpi-reorden-sub" class="text-xs text-slate-500 mt-1">Meta descanso ≥ 45 días</p>
+                </div>
+
+                <div class="bg-white rounded-2xl p-4 sm:p-5 shadow-sm border border-slate-200/80">
+                    <span class="text-xs font-semibold text-slate-500">En Recuperación</span>
+                    <div id="pastoreo-kpi-creciendo" class="text-2xl font-extrabold text-amber-600 mt-1">0 / 46</div>
+                    <p class="text-xs text-slate-500 mt-1">Rebrote en curso</p>
+                </div>
+            </div>
+
+            <!-- Barra de Controles y Punto de Reorden -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+                <div class="flex flex-wrap items-center gap-3">
+                    <div class="inline-flex rounded-xl bg-slate-100 p-1 border border-slate-200/80">
+                        <button data-pview="mapa" class="pview-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-white text-forest-900 shadow-sm">Croquis en Espejo</button>
+                        <button data-pview="lista" class="pview-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900">Tablero de Control (46)</button>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs">
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-blue-50 text-blue-800 font-medium border border-blue-200"><span class="w-2 h-2 rounded-full bg-blue-600"></span> En Pastoreo</span>
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-50 text-emerald-800 font-medium border border-emerald-200"><span class="w-2 h-2 rounded-full bg-emerald-600"></span> Listo</span>
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 font-medium border border-amber-200"><span class="w-2 h-2 rounded-full bg-amber-500"></span> Creciendo</span>
+                    </div>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-3">
+                    <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
+                        <label for="pastoreo-meta-dias" class="text-xs font-semibold text-slate-700">Días de descanso meta:</label>
+                        <input type="number" id="pastoreo-meta-dias" value="45" min="15" max="120" class="w-16 text-center font-bold text-sm bg-white border border-slate-300 rounded-lg py-0.5 text-forest-900 focus:outline-none">
+                    </div>
+                    <div class="flex items-center gap-2 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-200">
+                        <label for="pastoreo-fecha-ref" class="text-xs font-semibold text-slate-700">Fecha hoy:</label>
+                        <input type="date" id="pastoreo-fecha-ref" class="text-xs font-semibold bg-white border border-slate-300 rounded-lg px-2 py-1 text-slate-800 focus:outline-none">
+                    </div>
+                </div>
+            </div>
+
+            <!-- VISTA A: CROQUIS EN ESPEJO (FRANJA NORTE | CALLEJÓN 3m | FRANJA SUR) -->
+            <div id="pastoreo-view-mapa" class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4 sm:p-6">
+                <div class="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-base">Mapa Visual de Distribución (Toca un cuadro para gestionar o mover el ganado)</h3>
+                        <p class="text-xs text-slate-500">Ida por Franja Norte (Cuadros 1 al 23) y regreso por Franja Sur (Cuadros 24 al 46) hacia el bebedero.</p>
+                    </div>
+                </div>
+
+                <!-- Cabecera Bebedero -->
+                <div class="mb-3 p-3 rounded-xl bg-sky-50 border border-sky-200 text-center">
+                    <span class="text-xs font-bold uppercase tracking-wider text-sky-900">💧 Cabecera de Bebedero y Manejo (Metros 0.0 a 18.4)</span>
+                </div>
+
+                <!-- Encabezados de Columnas -->
+                <div class="grid grid-cols-11 gap-2 text-center text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2 px-1">
+                    <div class="col-span-5 bg-slate-100 py-2 rounded-lg text-slate-700">Franja Norte (Fondo 62 m)</div>
+                    <div class="col-span-1 bg-amber-100/70 py-2 rounded-lg text-amber-900 truncate" title="Callejón Central 3 m">3m</div>
+                    <div class="col-span-5 bg-slate-100 py-2 rounded-lg text-slate-700">Franja Sur (Fondo 62 m)</div>
+                </div>
+
+                <!-- 23 Filas en Espejo -->
+                <div id="pastoreo-mirror-grid" class="space-y-2">
+                    <!-- Populated by JS -->
+                </div>
+
+                <!-- Fin del Pasillo -->
+                <div class="mt-3 p-2.5 rounded-xl bg-slate-100 border border-slate-200 text-center text-xs font-semibold text-slate-600">
+                    ↩️ Fin del Callejón Central (Metro 423) — Paso en U del Cuadro 23 al Cuadro 24
+                </div>
+            </div>
+
+            <!-- VISTA B: TABLERO KANBAN / LISTA DE 46 CUADROS -->
+            <div id="pastoreo-view-lista" class="hidden bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+                <div class="p-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <h3 class="font-bold text-slate-900 text-base">Control Detallado de los 46 Potreros</h3>
+                    <select id="pastoreo-filter-status" class="rounded-xl border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white">
+                        <option value="all">Mostrar todos (46)</option>
+                        <option value="activo">En Pastoreo</option>
+                        <option value="listo">Listos para Entrar</option>
+                        <option value="creciendo">Creciendo (En descanso)</option>
+                    </select>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                                <th class="py-3 px-4">Cuadro</th>
+                                <th class="py-3 px-4">Ubicación</th>
+                                <th class="py-3 px-4 text-right">Área (m²)</th>
+                                <th class="py-3 px-4">Última Salida</th>
+                                <th class="py-3 px-4 text-center">Días Descanso</th>
+                                <th class="py-3 px-4">Estatus</th>
+                                <th class="py-3 px-4 hidden md:table-cell">Notas</th>
+                                <th class="py-3 px-4 text-right">Acción Rápida</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pastoreo-table-tbody" class="divide-y divide-slate-100 text-sm">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================================================================== -->
+        <!-- MÓDULOS PLACEHOLDER: INVENTARIO Y GASTOS                            -->
+        <!-- =================================================================== -->
+        <section id="tab-inventario" class="tab-content hidden">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-10 text-center max-w-xl mx-auto mt-8">
+                <div class="w-16 h-16 rounded-2xl bg-forest-50 text-forest-700 flex items-center justify-center mx-auto mb-4">
+                    <i data-lucide="clipboard-list" class="w-8 h-8"></i>
+                </div>
+                <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 mb-3">Módulo en Desarrollo</span>
+                <h2 class="text-2xl font-bold text-slate-900">Inventario y Control de Lotes</h2>
+                <p class="text-sm text-slate-500 mt-2 leading-relaxed">
+                    Aquí podrás registrar aretes SINIIGA, pesajes periódicos, cálculo automático de Ganancia Diaria de Peso (GDP) real por corral y calendario sanitario.
+                </p>
+            </div>
+        </section>
+
+        <section id="tab-gastos" class="tab-content hidden">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-10 text-center max-w-xl mx-auto mt-8">
+                <div class="w-16 h-16 rounded-2xl bg-forest-50 text-forest-700 flex items-center justify-center mx-auto mb-4">
+                    <i data-lucide="wallet" class="w-8 h-8"></i>
+                </div>
+                <span class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 mb-3">Módulo en Desarrollo</span>
+                <h2 class="text-2xl font-bold text-slate-900">Gastos, Inversiones y Punto de Equilibrio</h2>
+                <p class="text-sm text-slate-500 mt-2 leading-relaxed">
+                    Controla compras de insumos, medicamentos, mano de obra y calcula el costo real por kilogramo producido al cierre de cada ciclo de engorda.
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- =================================================================== -->
+    <!-- MODAL: AGREGAR / EDITAR INSUMO                                      -->
+    <!-- =================================================================== -->
+    <div id="modal-ingredient" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 no-print">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg overflow-hidden">
+            <div class="px-6 py-4 bg-forest-900 text-white flex items-center justify-between">
+                <h3 id="modal-ing-title" class="font-bold text-base">Nuevo Insumo</h3>
+                <button id="btn-close-ing-modal" class="p-1 rounded-lg hover:bg-white/10 transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <form id="form-ingredient" class="p-6 space-y-4">
+                <input type="hidden" id="ing-id">
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="sm:col-span-2">
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Nombre del Insumo *</label>
+                        <input type="text" id="ing-nombre" required placeholder="Ej. Silo de maíz" class="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-forest-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Categoría</label>
+                        <select id="ing-categoria" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-forest-600">
+                            <option value="Grano/Energético">Grano/Energético</option>
+                            <option value="Subproducto">Subproducto</option>
+                            <option value="Proteico">Proteico</option>
+                            <option value="Forraje">Forraje</option>
+                            <option value="Energético/Aditivo">Energético/Aditivo</option>
+                            <option value="Nitrógeno No Proteico">Nitrógeno No Proteico</option>
+                            <option value="Mineral/Aditivo">Mineral/Aditivo</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Precio Base Húmeda ($/kg) *</label>
+                        <input type="number" id="ing-precio" required step="0.01" min="0" placeholder="0.00" class="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-forest-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">% Materia Seca (MS) *</label>
+                        <input type="number" id="ing-ms" required step="0.1" min="5" max="100" value="88" class="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-forest-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">% Proteína Cruda (BS) *</label>
+                        <input type="number" id="ing-pc" required step="0.1" min="0" max="300" value="10" class="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-forest-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">ENg (Mcal/kg MS) *</label>
+                        <input type="number" id="ing-eng" required step="0.01" min="0" max="3" value="1.20" class="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-forest-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">ENm (Mcal/kg MS) *</label>
+                        <input type="number" id="ing-enm" required step="0.01" min="0" max="3.5" value="1.80" class="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-forest-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">% FDN (Fibra) *</label>
+                        <input type="number" id="ing-fdn" required step="0.5" min="0" max="100" value="20" class="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-forest-600">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Mín %</label>
+                            <input type="number" id="ing-min" step="0.5" min="0" max="100" value="0" class="w-full rounded-xl border border-slate-300 px-2.5 py-2 text-sm focus:outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Máx %</label>
+                            <input type="number" id="ing-max" step="0.5" min="0" max="100" value="100" class="w-full rounded-xl border border-slate-300 px-2.5 py-2 text-sm focus:outline-none">
+                        </div>
+                    </div>
+                </div>
+                <div class="pt-4 border-t border-slate-100 flex justify-end gap-2">
+                    <button type="button" id="btn-cancel-ing-modal" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 text-sm font-medium hover:bg-slate-50">Cancelar</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-forest-900 hover:bg-forest-800 text-white text-sm font-semibold shadow-sm">Guardar Insumo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- MODAL: DETALLE Y MOVIMIENTO DE CUADRO DE PASTOREO                   -->
+    <!-- =================================================================== -->
+    <div id="modal-pastoreo" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 no-print">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+            <div class="px-6 py-4 bg-forest-900 text-white flex items-center justify-between">
+                <div>
+                    <h3 id="modal-p-title" class="font-bold text-base">Cuadro #1</h3>
+                    <p id="modal-p-sub" class="text-xs text-forest-100/80">Franja Norte • 1,140 m²</p>
+                </div>
+                <button id="btn-close-p-modal" class="p-1 rounded-lg hover:bg-white/10 transition-colors">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div class="p-6 space-y-4">
+                <input type="hidden" id="p-cuadro-id">
+                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                    <div>
+                        <span class="block text-xs text-slate-500">Estado Actual</span>
+                        <span id="modal-p-status-badge" class="inline-block mt-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">Listo</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="block text-xs text-slate-500">Días de Descanso</span>
+                        <span id="modal-p-dias" class="text-xl font-extrabold text-slate-900">46 días</span>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Fecha de Última Salida del Ganado</label>
+                    <input type="date" id="p-fecha-salida" class="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-forest-600">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">Observaciones de Campo</label>
+                    <textarea id="p-notas" rows="2" placeholder="Ej. Buen rebrote, revisar cerco eléctrico..." class="w-full rounded-xl border border-slate-300 px-3.5 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-forest-600"></textarea>
+                    <div class="flex flex-wrap gap-1.5 mt-2">
+                        <button type="button" data-quicknote="Buen rebrote" class="quick-note-btn text-[11px] px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700">+ Buen rebrote</button>
+                        <button type="button" data-quicknote="Falta fertilizar" class="quick-note-btn text-[11px] px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700">+ Falta fertilizar</button>
+                        <button type="button" data-quicknote="Revisar cerco" class="quick-note-btn text-[11px] px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700">+ Revisar cerco</button>
+                    </div>
+                </div>
+
+                <div class="pt-3 border-t border-slate-100 space-y-2">
+                    <button type="button" id="btn-meter-ganado-aqui" class="w-full py-3 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-sm flex items-center justify-center gap-2 transition-colors">
+                        <i data-lucide="log-in" class="w-4 h-4"></i>
+                        <span>Meter ganado aquí hoy</span>
+                    </button>
+                    <div class="flex justify-end gap-2 pt-1">
+                        <button type="button" id="btn-cancel-p-modal" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 text-xs font-semibold hover:bg-slate-50">Cancelar</button>
+                        <button type="button" id="btn-save-p-modal" class="px-4 py-2 rounded-xl bg-forest-900 hover:bg-forest-800 text-white text-xs font-semibold">Guardar Cambios</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- MODAL DE CONFIRMACIÓN GENÉRICO (SIN alert/confirm NATIVOS)          -->
+    <!-- =================================================================== -->
+    <div id="modal-confirm" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 no-print">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm p-6 space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0">
+                    <i data-lucide="alert-circle" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h4 id="confirm-title" class="font-bold text-slate-900 text-base">Confirmar acción</h4>
+                    <p id="confirm-msg" class="text-xs text-slate-600 mt-0.5">¿Estás seguro?</p>
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button id="btn-confirm-cancel" class="px-4 py-2 rounded-xl border border-slate-300 text-slate-700 text-xs font-semibold hover:bg-slate-50">Cancelar</button>
+                <button id="btn-confirm-ok" class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white text-xs font-semibold">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =================================================================== -->
     <!-- MODAL: GUARDAR DIETA EN HISTORIAL                                  -->
     <!-- =================================================================== -->
     <div id="modal-save-diet" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4 no-print">
@@ -763,4 +1138,1555 @@
 
         // Estado de Pastoreo Rotativo (46 Cuadros)
         let pastoreoState = {
-// ... existing code ... -->
+            metaDias: 45,
+            fechaRef: new Date().toISOString().split('T')[0],
+            activoId: 1,
+            cuadros: []
+        };
+
+        // -------------------------------------------------------------------
+        // 2. INICIALIZACIÓN DE DATOS LOCALES Y PASTOREO
+        // -------------------------------------------------------------------
+        function buildDefaultPastoreo() {
+            const today = new Date().toISOString().split('T')[0];
+            const cuadros = [];
+            for (let i = 1; i <= 46; i++) {
+                // Simular rotación inicial escalonada realista
+                const daysAgo = i === 1 ? 0 : (47 - i);
+                const d = new Date();
+                d.setDate(d.getDate() - daysAgo);
+                cuadros.push({
+                    id: i,
+                    franja: i <= 23 ? 'Norte' : 'Sur',
+                    area: 1140,
+                    fechaSalida: d.toISOString().split('T')[0],
+                    notas: ''
+                });
+            }
+            return {
+                metaDias: 45,
+                fechaRef: today,
+                activoId: 1,
+                cuadros
+            };
+        }
+
+        function loadLocalState() {
+            try {
+                const rawIng = localStorage.getItem(STORAGE_KEY);
+                ingredients = rawIng ? JSON.parse(rawIng) : JSON.parse(JSON.stringify(DEFAULT_INGREDIENTS));
+            } catch (e) {
+                ingredients = JSON.parse(JSON.stringify(DEFAULT_INGREDIENTS));
+            }
+
+            try {
+                const rawPast = localStorage.getItem(PASTOREO_STORAGE_KEY);
+                pastoreoState = rawPast ? JSON.parse(rawPast) : buildDefaultPastoreo();
+            } catch (e) {
+                pastoreoState = buildDefaultPastoreo();
+            }
+        }
+
+        function saveIngredientsState() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(ingredients));
+            } catch (e) {}
+            if (!isApplyingRemoteState && typeof window.syncIngredientsToCloud === 'function') {
+                window.syncIngredientsToCloud(ingredients);
+            }
+        }
+
+        function savePastoreoState() {
+            try {
+                localStorage.setItem(PASTOREO_STORAGE_KEY, JSON.stringify(pastoreoState));
+            } catch (e) {}
+            if (!isApplyingRemoteState && typeof window.syncPastoreoToCloud === 'function') {
+                window.syncPastoreoToCloud(pastoreoState);
+            }
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            if (!toast || !toastMsg) return;
+            toastMsg.textContent = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2800);
+        }
+
+        function openConfirmModal(title, msg, onConfirm) {
+            document.getElementById('confirm-title').textContent = title;
+            document.getElementById('confirm-msg').textContent = msg;
+            confirmCallback = onConfirm;
+            document.getElementById('modal-confirm').classList.remove('hidden');
+        }
+
+        // -------------------------------------------------------------------
+        // 3. CÁLCULO DE REQUERIMIENTOS NUTRICIONALES (NRC / NASEM)
+        // -------------------------------------------------------------------
+        function calculateNutritionalRequirements() {
+            const proposito = document.getElementById('animal-proposito').value;
+            const sexo = document.getElementById('animal-sexo').value;
+            const raza = document.getElementById('animal-raza').value;
+            const peso = parseFloat(document.getElementById('animal-peso').value) || 320;
+            const gdp = parseFloat(document.getElementById('animal-gdp').value) || 1.5;
+            const leche = parseFloat(document.getElementById('animal-leche').value) || 22;
+            const temp = parseFloat(document.getElementById('animal-temp').value) || 28;
+            const implante = document.getElementById('animal-implante').checked;
+
+            const containerGdp = document.getElementById('container-meta-gdp');
+            const containerLeche = document.getElementById('container-meta-leche');
+            const enLabel = document.getElementById('req-en-label');
+            const kpiEnLabel = document.getElementById('kpi-en-label');
+
+            if (proposito === 'lechero') {
+                containerGdp.classList.add('hidden');
+                containerLeche.classList.remove('hidden');
+                enLabel.textContent = 'Energía Neta Lactancia (ENl)';
+                kpiEnLabel.textContent = 'ENl Lograda:';
+            } else {
+                containerGdp.classList.remove('hidden');
+                containerLeche.classList.add('hidden');
+                enLabel.textContent = 'Energía de Ganancia (ENg)';
+                kpiEnLabel.textContent = 'ENg Lograda:';
+            }
+
+            let cmsPct = 2.65;
+            let pcReq = 14.5;
+            let enReq = 1.30;
+            let fdnReq = 16.0;
+            let nota = '';
+
+            if (proposito === 'recepcion') {
+                cmsPct = 2.35;
+                pcReq = 15.0;
+                enReq = 1.05;
+                fdnReq = 28.0;
+                nota = 'Etapa de recepción: prioriza fibra efectiva (FDN ≥ 28%) y proteína de alta calidad para recuperar el rumen tras el transporte.';
+            } else if (proposito === 'desarrollo') {
+                cmsPct = 2.65;
+                pcReq = 14.2 + (gdp - 1.3) * 1.2;
+                enReq = 1.18 + (gdp - 1.2) * 0.25;
+                fdnReq = 18.0;
+                nota = 'Etapa de desarrollo: balance óptimo entre crecimiento muscular (PC) y densidad energética para ganancias sostenidas sin engrasamiento prematuro.';
+            } else if (proposito === 'finalizacion') {
+                cmsPct = 2.55;
+                pcReq = 13.0 + (gdp - 1.5) * 0.8;
+                enReq = 1.36 + (gdp - 1.5) * 0.22;
+                fdnReq = 13.0;
+                nota = 'Etapa de finalización: alta concentración energética. Vigila que la FDN no baje de 12-13% para prevenir acidosis ruminal.';
+            } else if (proposito === 'lechero') {
+                cmsPct = 2.2 + (leche * 0.045);
+                pcReq = 15.5 + (leche - 20) * 0.12;
+                enReq = 1.55 + (leche - 20) * 0.015;
+                fdnReq = 28.0;
+                nota = 'Ganado lechero: requiere alto consumo de materia seca y al menos 28% de FDN para mantener grasa en leche y salud ruminal.';
+            } else {
+                cmsPct = 2.0;
+                pcReq = 10.5;
+                enReq = 0.85;
+                fdnReq = 36.0;
+                nota = 'Mantenimiento: dieta económica basada en forrajes y subproductos fibrosos para conservar condición corporal.';
+            }
+
+            if (sexo === 'macho_entero') {
+                pcReq += 0.4;
+            } else if (sexo === 'hembra') {
+                cmsPct -= 0.08;
+                pcReq -= 0.3;
+            }
+
+            if (raza === 'cebu') {
+                cmsPct -= 0.10;
+            } else if (raza === 'europeo') {
+                cmsPct += 0.08;
+            }
+
+            if (temp > 32) {
+                const factorCalor = Math.min(0.15, (temp - 32) * 0.012);
+                cmsPct *= (1 - factorCalor);
+                pcReq += 0.4;
+                nota += ` Estrés calórico (${temp}°C): consumo ajustado -${(factorCalor * 100).toFixed(1)}%.`;
+            } else if (temp < 10) {
+                cmsPct *= 1.05;
+            }
+
+            if (implante) {
+                cmsPct *= 1.04;
+                pcReq += 0.6;
+            }
+
+            const cmsKg = (peso * cmsPct) / 100;
+
+            document.getElementById('req-cms').value = cmsKg.toFixed(2);
+            document.getElementById('req-cms-pct').textContent = `${cmsPct.toFixed(2)}% del Peso Vivo`;
+            document.getElementById('req-pc').value = Math.max(8, pcReq).toFixed(1);
+            document.getElementById('req-en').value = Math.max(0.6, enReq).toFixed(2);
+            document.getElementById('req-fdn').value = Math.max(10, fdnReq).toFixed(1);
+            document.getElementById('nota-tecnica-texto').textContent = nota;
+        }
+
+        // -------------------------------------------------------------------
+        // 4. ALGORITMO SIMPLEX DE DOS FASES (PROGRAMACIÓN LINEAL EN JS PURO)
+        // -------------------------------------------------------------------
+        function solveDietLP() {
+            const selected = ingredients.filter(i => i.selected);
+            const errorBox = document.getElementById('solver-error-box');
+            const errorMsg = document.getElementById('solver-error-msg');
+            const resultsSection = document.getElementById('results-section');
+
+            errorBox.classList.add('hidden');
+
+            if (selected.length < 2) {
+                errorMsg.textContent = 'Selecciona al menos 2 insumos disponibles en la tabla para formular una dieta.';
+                errorBox.classList.remove('hidden');
+                resultsSection.classList.add('hidden');
+                return;
+            }
+
+            const reqPC = parseFloat(document.getElementById('req-pc').value) || 14.5;
+            const reqEN = parseFloat(document.getElementById('req-en').value) || 1.30;
+            const reqFDN = parseFloat(document.getElementById('req-fdn').value) || 16.0;
+            const proposito = document.getElementById('animal-proposito').value;
+            const isLechero = proposito === 'lechero';
+
+            const n = selected.length;
+            let sumMin = 0;
+            let sumMax = 0;
+            for (let i = 0; i < n; i++) {
+                const mn = Math.max(0, parseFloat(selected[i].min) || 0);
+                const mx = Math.min(100, parseFloat(selected[i].max) || 100);
+                if (mn > mx) {
+                    errorMsg.textContent = `El límite mínimo (${mn}%) de "${selected[i].nombre}" es mayor que su máximo (${mx}%).`;
+                    errorBox.classList.remove('hidden');
+                    resultsSection.classList.add('hidden');
+                    return;
+                }
+                sumMin += mn;
+                sumMax += mx;
+            }
+
+            if (sumMin > 100.001) {
+                errorMsg.textContent = `La suma de los porcentajes mínimos seleccionados es ${sumMin.toFixed(1)}%, lo cual excede el 100% de la dieta.`;
+                errorBox.classList.remove('hidden');
+                resultsSection.classList.add('hidden');
+                return;
+            }
+
+            if (sumMax < 99.999) {
+                errorMsg.textContent = `La suma de los porcentajes máximos seleccionados es ${sumMax.toFixed(1)}%, no alcanza para completar el 100% de la dieta.`;
+                errorBox.classList.remove('hidden');
+                resultsSection.classList.add('hidden');
+                return;
+            }
+
+            // Construir restricciones estándar: A * x (<=, >=, =) b, con x >= 0
+            // Trabajamos en proporciones (0 a 1) para estabilidad numérica
+            const costBS = selected.map(ing => ing.precio / ((ing.ms || 88) / 100));
+            const constraints = [];
+
+            // 1. Suma de proporciones = 1
+            constraints.push({ coeffs: Array(n).fill(1), type: '=', rhs: 1 });
+
+            // 2. Proteína Cruda >= reqPC
+            constraints.push({ coeffs: selected.map(i => i.pc), type: '>=', rhs: reqPC });
+
+            // 3. Energía >= reqEN
+            constraints.push({ coeffs: selected.map(i => isLechero ? (i.enm * 0.96) : i.eng), type: '>=', rhs: reqEN });
+
+            // 4. FDN >= reqFDN
+            constraints.push({ coeffs: selected.map(i => i.fdn), type: '>=', rhs: reqFDN });
+
+            // 5. Límites individuales min y max
+            for (let i = 0; i < n; i++) {
+                const mn = (parseFloat(selected[i].min) || 0) / 100;
+                const mx = (parseFloat(selected[i].max) || 100) / 100;
+                if (mn > 0) {
+                    const c = Array(n).fill(0);
+                    c[i] = 1;
+                    constraints.push({ coeffs: c, type: '>=', rhs: mn });
+                }
+                if (mx < 1) {
+                    const c = Array(n).fill(0);
+                    c[i] = 1;
+                    constraints.push({ coeffs: c, type: '<=', rhs: mx });
+                }
+            }
+
+            const result = twoPhaseSimplex(costBS, constraints, n);
+
+            if (!result.feasible) {
+                errorMsg.textContent = 'Con los insumos seleccionados y sus límites actuales no es matemáticamente posible alcanzar los requerimientos de PC, Energía o FDN. Intenta incluir un concentrado energético/proteico o ampliar los máximos.';
+                errorBox.classList.remove('hidden');
+                resultsSection.classList.add('hidden');
+                return;
+            }
+
+            // Construir solución detallada
+            const items = [];
+            let totalPC = 0;
+            let totalEN = 0;
+            let totalFDN = 0;
+            let totalBHfor100MS = 0;
+            let totalCostfor100MS = 0;
+
+            for (let i = 0; i < n; i++) {
+                const pctBS = Math.max(0, result.x[i] * 100);
+                if (pctBS > 0.005) {
+                    const ing = selected[i];
+                    const msFactor = (ing.ms || 88) / 100;
+                    const kgBH_100MS = pctBS / msFactor;
+                    const cost_100MS = kgBH_100MS * ing.precio;
+
+                    totalPC += (pctBS / 100) * ing.pc;
+                    totalEN += (pctBS / 100) * (isLechero ? (ing.enm * 0.96) : ing.eng);
+                    totalFDN += (pctBS / 100) * ing.fdn;
+                    totalBHfor100MS += kgBH_100MS;
+                    totalCostfor100MS += cost_100MS;
+
+                    items.push({
+                        id: ing.id,
+                        nombre: ing.nombre,
+                        categoria: ing.categoria,
+                        pctBS,
+                        ms: ing.ms,
+                        precioBH: ing.precio,
+                        kgBH_100MS,
+                        cost_100MS
+                    });
+                }
+            }
+
+            items.sort((a, b) => b.pctBS - a.pctBS);
+
+            const cmsAnimal = parseFloat(document.getElementById('req-cms').value) || 9.6;
+            const msPctGlobal = (100 / totalBHfor100MS) * 100;
+            const aguaPctGlobal = 100 - msPctGlobal;
+            const costoKgBH = totalCostfor100MS / totalBHfor100MS;
+            const kgServirAnimal = cmsAnimal / (msPctGlobal / 100);
+            const costoDiarioAnimal = kgServirAnimal * costoKgBH;
+
+            lastSolution = {
+                items,
+                totalPC,
+                totalEN,
+                totalFDN,
+                msPctGlobal,
+                aguaPctGlobal,
+                costoKgBH,
+                cmsAnimal,
+                kgServirAnimal,
+                costoDiarioAnimal,
+                totalBHfor100MS,
+                totalCostfor100MS,
+                animalProfile: {
+                    proposito,
+                    peso: parseFloat(document.getElementById('animal-peso').value) || 320,
+                    gdp: parseFloat(document.getElementById('animal-gdp').value) || 1.5
+                }
+            };
+
+            resultsSection.classList.remove('hidden');
+            renderSolutionResults();
+            resultsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function twoPhaseSimplex(c, constraints, numVars) {
+            const m = constraints.length;
+            let slackCount = 0;
+            let artificialCount = 0;
+
+            constraints.forEach(con => {
+                if (con.type === '<=') slackCount++;
+                else if (con.type === '>=') { slackCount++; artificialCount++; }
+                else if (con.type === '=') artificialCount++;
+            });
+
+            const totalCols = numVars + slackCount + artificialCount;
+            const tableau = Array.from({ length: m + 1 }, () => Array(totalCols + 1).fill(0));
+            const basis = Array(m).fill(-1);
+            const artificialCols = [];
+
+            let sIdx = numVars;
+            let aIdx = numVars + slackCount;
+
+            for (let i = 0; i < m; i++) {
+                const con = constraints[i];
+                for (let j = 0; j < numVars; j++) {
+                    tableau[i][j] = con.coeffs[j];
+                }
+                tableau[i][totalCols] = con.rhs;
+
+                if (con.type === '<=') {
+                    tableau[i][sIdx] = 1;
+                    basis[i] = sIdx;
+                    sIdx++;
+                } else if (con.type === '>=') {
+                    tableau[i][sIdx] = -1;
+                    tableau[i][aIdx] = 1;
+                    basis[i] = aIdx;
+                    artificialCols.push(aIdx);
+                    sIdx++;
+                    aIdx++;
+                } else if (con.type === '=') {
+                    tableau[i][aIdx] = 1;
+                    basis[i] = aIdx;
+                    artificialCols.push(aIdx);
+                    aIdx++;
+                }
+            }
+
+            // Fase 1: Minimizar suma de variables artificiales
+            if (artificialCount > 0) {
+                for (let j of artificialCols) {
+                    tableau[m][j] = 1;
+                }
+                for (let i = 0; i < m; i++) {
+                    if (artificialCols.includes(basis[i])) {
+                        for (let j = 0; j <= totalCols; j++) {
+                            tableau[m][j] -= tableau[i][j];
+                        }
+                    }
+                }
+
+                runSimplexIterations(tableau, basis, m, totalCols);
+
+                if (Math.abs(tableau[m][totalCols]) > 1e-4) {
+                    return { feasible: false };
+                }
+            }
+
+            // Fase 2: Minimizar función objetivo real c^T * x
+            for (let j = 0; j <= totalCols; j++) tableau[m][j] = 0;
+            for (let j = 0; j < numVars; j++) tableau[m][j] = c[j];
+
+            for (let i = 0; i < m; i++) {
+                const bCol = basis[i];
+                if (bCol < numVars && Math.abs(tableau[m][bCol]) > 1e-9) {
+                    const factor = tableau[m][bCol];
+                    for (let j = 0; j <= totalCols; j++) {
+                        tableau[m][j] -= factor * tableau[i][j];
+                    }
+                }
+            }
+
+            const allowedCols = numVars + slackCount;
+            runSimplexIterations(tableau, basis, m, allowedCols, totalCols);
+
+            const x = Array(numVars).fill(0);
+            for (let i = 0; i < m; i++) {
+                if (basis[i] < numVars) {
+                    x[basis[i]] = Math.max(0, tableau[i][totalCols]);
+                }
+            }
+
+            return { feasible: true, x };
+        }
+
+        function runSimplexIterations(tableau, basis, m, searchCols, rhsCol = null) {
+            if (rhsCol === null) rhsCol = searchCols;
+            const maxIter = 500;
+            for (let iter = 0; iter < maxIter; iter++) {
+                let enterCol = -1;
+                let minVal = -1e-7;
+                for (let j = 0; j < searchCols; j++) {
+                    if (tableau[m][j] < minVal) {
+                        minVal = tableau[m][j];
+                        enterCol = j;
+                    }
+                }
+                if (enterCol === -1) break;
+
+                let leaveRow = -1;
+                let minRatio = Infinity;
+                for (let i = 0; i < m; i++) {
+                    const a_ij = tableau[i][enterCol];
+                    if (a_ij > 1e-8) {
+                        const ratio = tableau[i][rhsCol] / a_ij;
+                        if (ratio < minRatio - 1e-9) {
+                            minRatio = ratio;
+                            leaveRow = i;
+                        }
+                    }
+                }
+                if (leaveRow === -1) break;
+
+                const pivot = tableau[leaveRow][enterCol];
+                for (let j = 0; j <= rhsCol; j++) {
+                    tableau[leaveRow][j] /= pivot;
+                }
+                for (let i = 0; i <= m; i++) {
+                    if (i !== leaveRow) {
+                        const factor = tableau[i][enterCol];
+                        if (Math.abs(factor) > 1e-11) {
+                            for (let j = 0; j <= rhsCol; j++) {
+                                tableau[i][j] -= factor * tableau[leaveRow][j];
+                            }
+                        }
+                    }
+                }
+                basis[leaveRow] = enterCol;
+            }
+        }
+
+        // -------------------------------------------------------------------
+        // 5. RENDERIZADO DE RESULTADOS, GRÁFICAS Y RENTABILIDAD
+        // -------------------------------------------------------------------
+        function renderSolutionResults() {
+            if (!lastSolution) return;
+            const sol = lastSolution;
+
+            // KPIs
+            document.getElementById('kpi-costo-kg').textContent = `$${sol.costoKgBH.toFixed(2)}`;
+            document.getElementById('kpi-costo-ton').textContent = `$${(sol.costoKgBH * 1000).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / Tonelada`;
+            document.getElementById('kpi-costo-dia').textContent = `$${sol.costoDiarioAnimal.toFixed(2)}`;
+            document.getElementById('kpi-costo-mes').textContent = `$${(sol.costoDiarioAnimal * 30).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} / mes por cabeza`;
+            document.getElementById('kpi-kg-servir').textContent = `${sol.kgServirAnimal.toFixed(2)} kg`;
+            document.getElementById('kpi-ms-agua').textContent = `MS: ${sol.msPctGlobal.toFixed(1)}% (${sol.cmsAnimal.toFixed(1)} kg) | Agua: ${sol.aguaPctGlobal.toFixed(1)}%`;
+
+            document.getElementById('kpi-pc-val').textContent = `${sol.totalPC.toFixed(2)}%`;
+            document.getElementById('kpi-en-val').textContent = `${sol.totalEN.toFixed(2)} Mcal`;
+            document.getElementById('kpi-fdn-val').textContent = `${sol.totalFDN.toFixed(1)}%`;
+
+            // Factor de escala
+            let scaleMultiplier = 1;
+            let subtitulo = 'Mostrando cantidades para 100 kg de Materia Seca';
+            if (currentScale === 'tonelada') {
+                scaleMultiplier = 1000 / sol.totalBHfor100MS;
+                subtitulo = 'Mostrando cantidades para preparar 1 Tonelada (1,000 kg Base Húmeda)';
+            } else if (currentScale === 'lote') {
+                const cabezas = parseInt(document.getElementById('lote-cabezas').value) || 30;
+                const totalBH_Lote = sol.kgServirAnimal * cabezas;
+                scaleMultiplier = totalBH_Lote / sol.totalBHfor100MS;
+                subtitulo = `Mostrando ración diaria total para ${cabezas} cabezas (${totalBH_Lote.toFixed(1)} kg BH/día)`;
+            }
+            document.getElementById('tabla-escala-subtitulo').textContent = subtitulo;
+
+            const tbody = document.getElementById('results-tbody');
+            tbody.innerHTML = '';
+
+            let sumPct = 0;
+            let sumKg = 0;
+            let sumCosto = 0;
+
+            const labels = [];
+            const dataPct = [];
+            const dataCost = [];
+
+            sol.items.forEach(item => {
+                const kgServir = item.kgBH_100MS * scaleMultiplier;
+                const costoReal = item.cost_100MS * scaleMultiplier;
+                sumPct += item.pctBS;
+                sumKg += kgServir;
+                sumCosto += costoReal;
+
+                labels.push(item.nombre);
+                dataPct.push(Number(item.pctBS.toFixed(2)));
+                dataCost.push(Number(costoReal.toFixed(2)));
+
+                const tr = document.createElement('tr');
+                tr.className = 'hover:bg-slate-50/80 transition-colors';
+                tr.innerHTML = `
+                    <td class="py-3 px-4 font-semibold text-slate-900">${item.nombre}</td>
+                    <td class="py-3 px-4 text-right font-medium text-forest-800">${item.pctBS.toFixed(2)}%</td>
+                    <td class="py-3 px-4 text-right font-bold text-slate-900">${kgServir.toFixed(2)} kg</td>
+                    <td class="py-3 px-4 text-right text-slate-600">$${item.precioBH.toFixed(2)}</td>
+                    <td class="py-3 px-4 text-right font-semibold text-slate-900">$${costoReal.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('results-tfoot').innerHTML = `
+                <tr>
+                    <td class="py-3.5 px-4">TOTAL MEZCLA</td>
+                    <td class="py-3.5 px-4 text-right">${sumPct.toFixed(1)}%</td>
+                    <td class="py-3.5 px-4 text-right">${sumKg.toFixed(2)} kg</td>
+                    <td class="py-3.5 px-4 text-right text-xs font-medium text-forest-800">$${sol.costoKgBH.toFixed(2)}/kg</td>
+                    <td class="py-3.5 px-4 text-right text-forest-900">$${sumCosto.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                </tr>
+            `;
+
+            updateCharts(labels, dataPct, dataCost);
+            updateProfitabilityCalculator();
+        }
+
+        function updateCharts(labels, dataPct, dataCost) {
+            if (typeof Chart === 'undefined') return;
+            const palette = ['#1B4332', '#2D6A4F', '#40916C', '#52B788', '#74C69D', '#95D5B2', '#D97706', '#0284C7', '#6366F1'];
+
+            const ctxComp = document.getElementById('chart-composition');
+            if (ctxComp) {
+                if (chartComposition) chartComposition.destroy();
+                chartComposition = new Chart(ctxComp, {
+                    type: 'doughnut',
+                    data: {
+                        labels,
+                        datasets: [{
+                            data: dataPct,
+                            backgroundColor: palette,
+                            borderWidth: 2,
+                            borderColor: '#FFFFFF'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'right', labels: { boxWidth: 12, font: { size: 11 } } }
+                        }
+                    }
+                });
+            }
+
+            const ctxCost = document.getElementById('chart-cost');
+            if (ctxCost) {
+                if (chartCost) chartCost.destroy();
+                chartCost = new Chart(ctxCost, {
+                    type: 'bar',
+                    data: {
+                        labels,
+                        datasets: [{
+                            label: 'Costo ($ MXN)',
+                            data: dataCost,
+                            backgroundColor: '#2D6A4F',
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true, ticks: { font: { size: 11 } } },
+                            x: { ticks: { font: { size: 10 } } }
+                        }
+                    }
+                });
+            }
+        }
+
+        function updateProfitabilityCalculator() {
+            if (!lastSolution) return;
+            const pesoIni = parseFloat(document.getElementById('rent-peso-ini').value) || 320;
+            const pesoFin = parseFloat(document.getElementById('rent-peso-fin').value) || 520;
+            const precioPie = parseFloat(document.getElementById('rent-precio-pie').value) || 75;
+            const gdp = parseFloat(document.getElementById('animal-gdp').value) || 1.5;
+
+            const kgGanar = Math.max(0, pesoFin - pesoIni);
+            const dias = gdp > 0 ? Math.ceil(kgGanar / gdp) : 0;
+            const gastoAlim = dias * lastSolution.costoDiarioAnimal;
+            const ingreso = kgGanar * precioPie;
+            const margen = ingreso - gastoAlim;
+
+            document.getElementById('rent-kg-ganar').textContent = `${kgGanar.toFixed(0)} kg`;
+            document.getElementById('rent-dias').textContent = `${dias} días`;
+            document.getElementById('rent-gasto-alim').textContent = `$${gastoAlim.toLocaleString('es-MX', { maximumFractionDigits: 0 })}`;
+            document.getElementById('rent-ingreso').textContent = `$${ingreso.toLocaleString('es-MX', { maximumFractionDigits: 0 })}`;
+            document.getElementById('rent-margen').textContent = `$${margen.toLocaleString('es-MX', { maximumFractionDigits: 0 })}`;
+        }
+
+        // -------------------------------------------------------------------
+        // 6. RENDERIZADO DE TABLAS DE INSUMOS (SOLVER Y BASE DE DATOS)
+        // -------------------------------------------------------------------
+        function renderSolverIngredientsTable() {
+            const tbody = document.getElementById('solver-ingredients-tbody');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            ingredients.forEach(ing => {
+                const tr = document.createElement('tr');
+                tr.className = `transition-colors ${ing.selected ? 'bg-white hover:bg-slate-50/80' : 'bg-slate-50/50 opacity-60'}`;
+                tr.innerHTML = `
+                    <td class="py-2.5 px-3 text-center">
+                        <input type="checkbox" data-id="${ing.id}" class="ing-select-cb w-4 h-4 rounded text-forest-700 focus:ring-forest-600 border-slate-300 cursor-pointer" ${ing.selected ? 'checked' : ''}>
+                    </td>
+                    <td class="py-2.5 px-3 font-semibold text-slate-900">${ing.nombre}</td>
+                    <td class="py-2.5 px-3 hidden md:table-cell text-xs text-slate-500">${ing.categoria}</td>
+                    <td class="py-2.5 px-3 text-right font-medium text-slate-800">$${ing.precio.toFixed(2)}</td>
+                    <td class="py-2.5 px-3 text-right hidden sm:table-cell text-slate-600">${ing.pc.toFixed(1)}%</td>
+                    <td class="py-2.5 px-3 text-right hidden sm:table-cell text-slate-600">${ing.eng.toFixed(2)}</td>
+                    <td class="py-2.5 px-3 text-right hidden lg:table-cell text-slate-600">${ing.fdn.toFixed(1)}%</td>
+                    <td class="py-2.5 px-3 text-center">
+                        <input type="number" data-id="${ing.id}" data-bound="min" value="${ing.min}" min="0" max="100" step="0.5" class="ing-bound-input w-16 text-center rounded-lg border border-slate-300 py-1 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-forest-600">
+                    </td>
+                    <td class="py-2.5 px-3 text-center">
+                        <input type="number" data-id="${ing.id}" data-bound="max" value="${ing.max}" min="0" max="100" step="0.5" class="ing-bound-input w-16 text-center rounded-lg border border-slate-300 py-1 text-xs font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-forest-600">
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function renderDatabaseTable() {
+            const tbody = document.getElementById('db-ingredients-tbody');
+            if (!tbody) return;
+            const search = (document.getElementById('db-search')?.value || '').toLowerCase();
+            const cat = document.getElementById('db-category-filter')?.value || 'all';
+
+            tbody.innerHTML = '';
+
+            ingredients
+                .filter(ing => (cat === 'all' || ing.categoria === cat) && ing.nombre.toLowerCase().includes(search))
+                .forEach(ing => {
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-slate-50/80 transition-colors';
+                    tr.innerHTML = `
+                        <td class="py-3 px-4 font-semibold text-slate-900">${ing.nombre}</td>
+                        <td class="py-3 px-4 text-xs text-slate-500">${ing.categoria}</td>
+                        <td class="py-3 px-4 text-right">
+                            <input type="number" data-id="${ing.id}" value="${ing.precio.toFixed(2)}" step="0.10" min="0" class="db-inline-price w-24 text-right font-bold text-forest-900 bg-forest-50/60 border border-forest-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-forest-600">
+                        </td>
+                        <td class="py-3 px-4 text-right text-slate-700">${ing.pc.toFixed(1)}%</td>
+                        <td class="py-3 px-4 text-right text-slate-700">${ing.eng.toFixed(2)}</td>
+                        <td class="py-3 px-4 text-right text-slate-700">${ing.enm.toFixed(2)}</td>
+                        <td class="py-3 px-4 text-right text-slate-700">${ing.ms.toFixed(0)}%</td>
+                        <td class="py-3 px-4 text-right text-slate-700">${ing.fdn.toFixed(1)}%</td>
+                        <td class="py-3 px-4 text-center">
+                            <div class="inline-flex items-center gap-1">
+                                <button data-id="${ing.id}" class="btn-edit-ing p-1.5 rounded-lg text-slate-500 hover:text-forest-800 hover:bg-forest-50 transition-colors" title="Editar">
+                                    <i data-lucide="pencil" class="w-4 h-4"></i>
+                                </button>
+                                <button data-id="${ing.id}" class="btn-delete-ing p-1.5 rounded-lg text-slate-500 hover:text-red-600 hover:bg-red-50 transition-colors" title="Eliminar">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        // -------------------------------------------------------------------
+        // 7. MÓDULO DE PASTOREO ROTATIVO (46 CUADROS EN ESPEJO)
+        // -------------------------------------------------------------------
+        function getCuadroStatus(cuadro) {
+            if (cuadro.id === pastoreoState.activoId) {
+                return { code: 'activo', label: 'En Pastoreo', dias: 0 };
+            }
+            const ref = new Date(pastoreoState.fechaRef + 'T00:00:00');
+            const sal = new Date((cuadro.fechaSalida || pastoreoState.fechaRef) + 'T00:00:00');
+            const diffDays = Math.max(0, Math.round((ref - sal) / (1000 * 60 * 60 * 24)));
+            if (diffDays >= pastoreoState.metaDias) {
+                return { code: 'listo', label: 'Listo para Entrar', dias: diffDays };
+            }
+            return { code: 'creciendo', label: 'Creciendo', dias: diffDays };
+        }
+
+        function renderPastoreoModule() {
+            const mirrorGrid = document.getElementById('pastoreo-mirror-grid');
+            const tableBody = document.getElementById('pastoreo-table-tbody');
+            if (!mirrorGrid || !tableBody) return;
+
+            document.getElementById('pastoreo-meta-dias').value = pastoreoState.metaDias;
+            document.getElementById('pastoreo-fecha-ref').value = pastoreoState.fechaRef;
+            document.getElementById('pastoreo-kpi-reorden-sub').textContent = `Meta descanso ≥ ${pastoreoState.metaDias} días`;
+
+            let listosCount = 0;
+            let creciendoCount = 0;
+            let bestNext = null;
+
+            const enriched = pastoreoState.cuadros.map(c => {
+                const st = getCuadroStatus(c);
+                if (st.code === 'listo') listosCount++;
+                if (st.code === 'creciendo') creciendoCount++;
+                if (st.code !== 'activo') {
+                    if (!bestNext || st.dias > bestNext.dias) {
+                        bestNext = { id: c.id, dias: st.dias, franja: c.franja };
+                    }
+                }
+                return { ...c, ...st };
+            });
+
+            const activoObj = enriched.find(c => c.id === pastoreoState.activoId) || enriched[0];
+            document.getElementById('pastoreo-kpi-activo').textContent = `Cuadro #${activoObj.id}`;
+            document.getElementById('pastoreo-kpi-activo-sub').textContent = `Franja ${activoObj.franja} • En pastoreo`;
+
+            if (bestNext) {
+                document.getElementById('pastoreo-kpi-siguiente').textContent = `Cuadro #${bestNext.id}`;
+                document.getElementById('pastoreo-kpi-siguiente-sub').textContent = `Franja ${bestNext.franja} • ${bestNext.dias} días descanso`;
+            }
+
+            document.getElementById('pastoreo-kpi-listos').textContent = `${listosCount} / 46`;
+            document.getElementById('pastoreo-kpi-creciendo').textContent = `${creciendoCount} / 46`;
+
+            // Renderizar 23 filas en espejo: Norte (1..23) | Pasillo | Sur (46..24)
+            mirrorGrid.innerHTML = '';
+            for (let row = 0; row < 23; row++) {
+                const norte = enriched[row];          // 1..23
+                const sur = enriched[45 - row];       // 46..24
+
+                const rowEl = document.createElement('div');
+                rowEl.className = 'grid grid-cols-11 gap-2 items-stretch';
+                rowEl.innerHTML = `
+                    ${renderCuadroCardHTML(norte)}
+                    <div class="col-span-1 bg-amber-50/80 border-x border-dashed border-amber-300 rounded-md flex items-center justify-center text-[10px] text-amber-700 font-semibold">
+                        ${row + 1}
+                    </div>
+                    ${renderCuadroCardHTML(sur)}
+                `;
+                mirrorGrid.appendChild(rowEl);
+            }
+
+            // Renderizar tabla de control
+            const statusFilter = document.getElementById('pastoreo-filter-status')?.value || 'all';
+            tableBody.innerHTML = '';
+
+            enriched
+                .filter(c => statusFilter === 'all' || c.code === statusFilter)
+                .forEach(c => {
+                    const badgeClass = c.code === 'activo'
+                        ? 'bg-blue-100 text-blue-800'
+                        : c.code === 'listo'
+                            ? 'bg-emerald-100 text-emerald-800'
+                            : 'bg-amber-100 text-amber-800';
+
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-slate-50/80 transition-colors';
+                    tr.innerHTML = `
+                        <td class="py-3 px-4 font-bold text-slate-900">Cuadro #${c.id}</td>
+                        <td class="py-3 px-4 text-xs text-slate-600">Franja ${c.franja}</td>
+                        <td class="py-3 px-4 text-right text-xs text-slate-600">${c.area} m²</td>
+                        <td class="py-3 px-4 text-xs text-slate-700">${c.fechaSalida}</td>
+                        <td class="py-3 px-4 text-center font-bold text-slate-900">${c.dias} d</td>
+                        <td class="py-3 px-4"><span class="px-2.5 py-0.5 rounded-full text-xs font-bold ${badgeClass}">${c.label}</span></td>
+                        <td class="py-3 px-4 hidden md:table-cell text-xs text-slate-500 max-w-[180px] truncate">${c.notas || '—'}</td>
+                        <td class="py-3 px-4 text-right">
+                            <button data-cid="${c.id}" class="btn-open-cuadro px-3 py-1.5 rounded-lg bg-forest-50 hover:bg-forest-100 text-forest-800 text-xs font-semibold transition-colors">
+                                Gestionar
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(tr);
+                });
+        }
+
+        function renderCuadroCardHTML(c) {
+            const styles = c.code === 'activo'
+                ? 'bg-blue-600 text-white border-blue-700 shadow-sm ring-2 ring-blue-300'
+                : c.code === 'listo'
+                    ? 'bg-emerald-50 hover:bg-emerald-100 text-emerald-950 border-emerald-300'
+                    : 'bg-amber-50/80 hover:bg-amber-100/80 text-amber-950 border-amber-200';
+
+            const subText = c.code === 'activo'
+                ? '🐄 AQUÍ HOY'
+                : `${c.dias}d desc.`;
+
+            return `
+                <button type="button" data-cid="${c.id}" class="btn-open-cuadro col-span-5 p-2.5 rounded-xl border text-left transition-all flex items-center justify-between gap-1 ${styles}">
+                    <div>
+                        <span class="block text-xs sm:text-sm font-extrabold leading-tight">C-${c.id}</span>
+                        <span class="block text-[10px] opacity-85 mt-0.5">${subText}</span>
+                    </div>
+                    ${c.notas ? '<span class="w-2 h-2 rounded-full bg-current opacity-75" title="Tiene notas"></span>' : ''}
+                </button>
+            `;
+        }
+
+        function openCuadroModal(id) {
+            const c = pastoreoState.cuadros.find(item => item.id === id);
+            if (!c) return;
+            const st = getCuadroStatus(c);
+
+            document.getElementById('p-cuadro-id').value = c.id;
+            document.getElementById('modal-p-title').textContent = `Cuadro #${c.id}`;
+            document.getElementById('modal-p-sub').textContent = `Franja ${c.franja} • ${c.area} m²`;
+            document.getElementById('modal-p-dias').textContent = `${st.dias} días`;
+            document.getElementById('p-fecha-salida').value = c.fechaSalida;
+            document.getElementById('p-notas').value = c.notas || '';
+
+            const badge = document.getElementById('modal-p-status-badge');
+            badge.textContent = st.label;
+            badge.className = `inline-block mt-1 px-2.5 py-0.5 rounded-full text-xs font-bold ${
+                st.code === 'activo' ? 'bg-blue-100 text-blue-800' :
+                st.code === 'listo' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+            }`;
+
+            document.getElementById('modal-pastoreo').classList.remove('hidden');
+        }
+
+        // -------------------------------------------------------------------
+        // 8. HISTÓRICO DE DIETAS GUARDADAS
+        // -------------------------------------------------------------------
+        function renderDietHistoryList() {
+            const container = document.getElementById('diet-history-list');
+            const countBadge = document.getElementById('diet-history-count');
+            if (!container || !countBadge) return;
+
+            countBadge.textContent = `${dietHistory.length} ${dietHistory.length === 1 ? 'dieta' : 'dietas'}`;
+
+            if (!dietHistory.length) {
+                container.innerHTML = `
+                    <div class="col-span-full py-8 text-center text-sm text-slate-400 border border-dashed border-slate-200 rounded-xl">
+                        Aún no hay dietas guardadas en el historial. Calcula una fórmula y haz clic en <strong>"Guardar dieta en historial"</strong>.
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = '';
+            dietHistory.forEach(diet => {
+                const card = document.createElement('div');
+                card.className = 'rounded-2xl border border-slate-200 bg-slate-50/60 hover:bg-white hover:shadow-md transition-all p-4 flex flex-col justify-between gap-3';
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-start justify-between gap-2">
+                            <h4 class="font-bold text-slate-900 text-sm leading-snug">${diet.nombre}</h4>
+                            <span class="text-[11px] font-semibold px-2 py-0.5 rounded-lg bg-forest-100 text-forest-900 shrink-0">$${Number(diet.costoKgBH || 0).toFixed(2)}/kg</span>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1">${diet.fecha || ''} ${diet.lote ? '• ' + diet.lote : ''}</p>
+                        <div class="mt-3 grid grid-cols-3 gap-1.5 text-center bg-white p-2 rounded-xl border border-slate-200/70 text-[11px]">
+                            <div>
+                                <span class="block text-slate-400">PC</span>
+                                <span class="font-bold text-slate-800">${Number(diet.totalPC || 0).toFixed(1)}%</span>
+                            </div>
+                            <div>
+                                <span class="block text-slate-400">Energía</span>
+                                <span class="font-bold text-slate-800">${Number(diet.totalEN || 0).toFixed(2)}</span>
+                            </div>
+                            <div>
+                                <span class="block text-slate-400">$/día</span>
+                                <span class="font-bold text-forest-800">$${Number(diet.costoDiarioAnimal || 0).toFixed(2)}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between pt-2 border-t border-slate-200/70">
+                        <button type="button" data-did="${diet.id}" class="btn-view-saved-diet text-xs font-semibold text-forest-800 hover:text-forest-950 flex items-center gap-1">
+                            <i data-lucide="eye" class="w-3.5 h-3.5"></i> Ver receta
+                        </button>
+                        <button type="button" data-did="${diet.id}" class="btn-delete-saved-diet text-xs font-medium text-slate-400 hover:text-red-600 p-1">
+                            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        function openViewDietModal(dietId) {
+            const diet = dietHistory.find(d => d.id === dietId);
+            if (!diet) return;
+            selectedHistoryDiet = diet;
+
+            document.getElementById('view-diet-title').textContent = diet.nombre;
+            document.getElementById('view-diet-meta').textContent = `${diet.fecha || ''} ${diet.lote ? '• ' + diet.lote : ''}`;
+
+            const rows = (diet.items || []).map(it => `
+                <tr class="border-b border-slate-100">
+                    <td class="py-2 font-medium text-slate-800">${it.nombre}</td>
+                    <td class="py-2 text-right text-forest-800 font-semibold">${Number(it.pctBS).toFixed(2)}%</td>
+                    <td class="py-2 text-right text-slate-700">${Number(it.kgBH_100MS).toFixed(2)} kg</td>
+                    <td class="py-2 text-right text-slate-600">$${Number(it.precioBH).toFixed(2)}</td>
+                </tr>
+            `).join('');
+
+            document.getElementById('view-diet-body').innerHTML = `
+                <div class="grid grid-cols-3 gap-2 text-center bg-forest-50 p-3 rounded-xl border border-forest-100">
+                    <div>
+                        <span class="block text-[11px] text-forest-700">Costo / kg BH</span>
+                        <span class="font-extrabold text-forest-950">$${Number(diet.costoKgBH || 0).toFixed(2)}</span>
+                    </div>
+                    <div>
+                        <span class="block text-[11px] text-forest-700">Costo / Día</span>
+                        <span class="font-extrabold text-forest-950">$${Number(diet.costoDiarioAnimal || 0).toFixed(2)}</span>
+                    </div>
+                    <div>
+                        <span class="block text-[11px] text-forest-700">PC / EN</span>
+                        <span class="font-extrabold text-forest-950">${Number(diet.totalPC || 0).toFixed(1)}% / ${Number(diet.totalEN || 0).toFixed(2)}</span>
+                    </div>
+                </div>
+                ${diet.notas ? `<p class="text-xs bg-amber-50 border border-amber-200 text-amber-900 p-3 rounded-xl">${diet.notas}</p>` : ''}
+                <table class="w-full text-xs text-left">
+                    <thead>
+                        <tr class="border-b border-slate-200 text-slate-500">
+                            <th class="py-2">Insumo</th>
+                            <th class="py-2 text-right">% BS</th>
+                            <th class="py-2 text-right">kg BH (100 MS)</th>
+                            <th class="py-2 text-right">$/kg</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            `;
+
+            document.getElementById('modal-view-diet').classList.remove('hidden');
+        }
+
+        // -------------------------------------------------------------------
+        // 9. EVENTOS DE INTERFAZ Y NAVEGACIÓN
+        // -------------------------------------------------------------------
+        function bindUIEvents() {
+            // Navegación entre pestañas
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const target = btn.dataset.tab;
+                    document.querySelectorAll('.tab-content').forEach(sec => sec.classList.add('hidden'));
+                    const targetSec = document.getElementById(`tab-${target}`);
+                    if (targetSec) targetSec.classList.remove('hidden');
+
+                    document.querySelectorAll('.nav-btn').forEach(b => {
+                        b.classList.remove('bg-forest-700', 'text-white', 'shadow-sm');
+                        b.classList.add('text-forest-100/80');
+                    });
+                    btn.classList.add('bg-forest-700', 'text-white', 'shadow-sm');
+                    btn.classList.remove('text-forest-100/80');
+
+                    if (target === 'pastoreo') renderPastoreoModule();
+                    if (target === 'insumos') renderDatabaseTable();
+
+                    // Cerrar sidebar en móvil
+                    document.getElementById('sidebar').classList.add('-translate-x-full');
+                    document.getElementById('sidebar-backdrop').classList.add('hidden');
+                });
+            });
+
+            // Menú móvil
+            document.getElementById('mobile-menu-btn')?.addEventListener('click', () => {
+                document.getElementById('sidebar').classList.remove('-translate-x-full');
+                document.getElementById('sidebar-backdrop').classList.remove('hidden');
+            });
+            const closeMobileMenu = () => {
+                document.getElementById('sidebar').classList.add('-translate-x-full');
+                document.getElementById('sidebar-backdrop').classList.add('hidden');
+            };
+            document.getElementById('close-sidebar-btn')?.addEventListener('click', closeMobileMenu);
+            document.getElementById('sidebar-backdrop')?.addEventListener('click', closeMobileMenu);
+
+            // Recalcular requerimientos al cambiar perfil
+            ['animal-proposito', 'animal-sexo', 'animal-raza', 'animal-peso', 'animal-edad', 'animal-gdp', 'animal-leche', 'animal-temp', 'animal-implante'].forEach(id => {
+                document.getElementById(id)?.addEventListener('change', calculateNutritionalRequirements);
+            });
+            document.getElementById('btn-recalc-req')?.addEventListener('click', () => {
+                calculateNutritionalRequirements();
+                showToast('Requerimientos recalculados');
+            });
+
+            // Selección y límites de insumos en Solver
+            document.getElementById('solver-ingredients-tbody')?.addEventListener('change', e => {
+                const id = parseInt(e.target.dataset.id);
+                const ing = ingredients.find(i => i.id === id);
+                if (!ing) return;
+
+                if (e.target.classList.contains('ing-select-cb')) {
+                    ing.selected = e.target.checked;
+                    saveIngredientsState();
+                    renderSolverIngredientsTable();
+                } else if (e.target.classList.contains('ing-bound-input')) {
+                    const bound = e.target.dataset.bound;
+                    ing[bound] = parseFloat(e.target.value) || 0;
+                    saveIngredientsState();
+                }
+            });
+
+            document.getElementById('btn-select-all-ing')?.addEventListener('click', () => {
+                const allSelected = ingredients.every(i => i.selected);
+                ingredients.forEach(i => i.selected = !allSelected);
+                saveIngredientsState();
+                renderSolverIngredientsTable();
+            });
+
+            document.getElementById('btn-goto-db')?.addEventListener('click', () => {
+                document.querySelector('[data-tab="insumos"]')?.click();
+            });
+
+            // Ejecutar Solver
+            document.getElementById('btn-run-solver')?.addEventListener('click', solveDietLP);
+
+            // Escalas de mezcla
+            document.querySelectorAll('.scale-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    currentScale = btn.dataset.scale;
+                    document.querySelectorAll('.scale-btn').forEach(b => {
+                        b.classList.remove('bg-white', 'text-forest-900', 'shadow-sm');
+                        b.classList.add('text-slate-600');
+                    });
+                    btn.classList.add('bg-white', 'text-forest-900', 'shadow-sm');
+                    btn.classList.remove('text-slate-600');
+
+                    const loteBox = document.getElementById('lote-input-container');
+                    if (currentScale === 'lote') loteBox.classList.remove('hidden');
+                    else loteBox.classList.add('hidden');
+
+                    renderSolutionResults();
+                });
+            });
+
+            document.getElementById('lote-cabezas')?.addEventListener('input', renderSolutionResults);
+
+            // Rentabilidad
+            ['rent-peso-ini', 'rent-peso-fin', 'rent-precio-pie'].forEach(id => {
+                document.getElementById(id)?.addEventListener('input', updateProfitabilityCalculator);
+            });
+
+            // Exportar CSV e Imprimir
+            document.getElementById('btn-export-csv')?.addEventListener('click', () => {
+                if (!lastSolution) return;
+                const lines = ['Insumo,% Base Seca,Precio ($/kg),MS %,Kg BH (100 MS),Costo Real ($)'];
+                lastSolution.items.forEach(it => {
+                    lines.push(`"${it.nombre}",${it.pctBS.toFixed(2)},${it.precioBH.toFixed(2)},${it.ms},${it.kgBH_100MS.toFixed(2)},${it.cost_100MS.toFixed(2)}`);
+                });
+                const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `dieta_ganadopro_${new Date().toISOString().split('T')[0]}.csv`;
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+
+            document.getElementById('btn-print-recipe')?.addEventListener('click', () => window.print());
+
+            // Guardar dieta en historial
+            document.getElementById('btn-save-diet-history')?.addEventListener('click', () => {
+                if (!lastSolution) return;
+                document.getElementById('diet-fecha').value = new Date().toISOString().split('T')[0];
+                document.getElementById('diet-nombre').value = '';
+                document.getElementById('diet-lote').value = '';
+                document.getElementById('diet-notas').value = '';
+                document.getElementById('modal-save-diet').classList.remove('hidden');
+            });
+
+            const closeSaveDietModal = () => document.getElementById('modal-save-diet').classList.add('hidden');
+            document.getElementById('btn-close-diet-modal')?.addEventListener('click', closeSaveDietModal);
+            document.getElementById('btn-cancel-diet-modal')?.addEventListener('click', closeSaveDietModal);
+
+            document.getElementById('form-save-diet')?.addEventListener('submit', async e => {
+                e.preventDefault();
+                if (!lastSolution) return;
+                const dietRecord = {
+                    nombre: document.getElementById('diet-nombre').value.trim(),
+                    lote: document.getElementById('diet-lote').value.trim(),
+                    fecha: document.getElementById('diet-fecha').value,
+                    notas: document.getElementById('diet-notas').value.trim(),
+                    costoKgBH: lastSolution.costoKgBH,
+                    costoDiarioAnimal: lastSolution.costoDiarioAnimal,
+                    totalPC: lastSolution.totalPC,
+                    totalEN: lastSolution.totalEN,
+                    totalFDN: lastSolution.totalFDN,
+                    items: lastSolution.items,
+                    createdAt: Date.now()
+                };
+
+                if (typeof window.saveDietToCloud === 'function') {
+                    await window.saveDietToCloud(dietRecord);
+                } else {
+                    dietRecord.id = 'local_' + Date.now();
+                    dietHistory.unshift(dietRecord);
+                    renderDietHistoryList();
+                }
+                closeSaveDietModal();
+                showToast('Dieta guardada en el historial');
+            });
+
+            // Eventos de lista de historial de dietas
+            document.getElementById('diet-history-list')?.addEventListener('click', e => {
+                const viewBtn = e.target.closest('.btn-view-saved-diet');
+                if (viewBtn) {
+                    openViewDietModal(viewBtn.dataset.did);
+                    return;
+                }
+                const delBtn = e.target.closest('.btn-delete-saved-diet');
+                if (delBtn) {
+                    const did = delBtn.dataset.did;
+                    openConfirmModal('Eliminar dieta', '¿Deseas borrar esta dieta del historial?', async () => {
+                        if (typeof window.deleteDietFromCloud === 'function') {
+                            await window.deleteDietFromCloud(did);
+                        } else {
+                            dietHistory = dietHistory.filter(d => d.id !== did);
+                            renderDietHistoryList();
+                        }
+                        showToast('Dieta eliminada');
+                    });
+                }
+            });
+
+            const closeViewDietModal = () => document.getElementById('modal-view-diet').classList.add('hidden');
+            document.getElementById('btn-close-view-diet')?.addEventListener('click', closeViewDietModal);
+            document.getElementById('btn-close-view-diet-2')?.addEventListener('click', closeViewDietModal);
+
+            document.getElementById('btn-reload-diet-from-modal')?.addEventListener('click', () => {
+                if (!selectedHistoryDiet) return;
+                const usedIds = new Set((selectedHistoryDiet.items || []).map(i => i.id));
+                ingredients.forEach(ing => {
+                    ing.selected = usedIds.has(ing.id);
+                });
+                saveIngredientsState();
+                renderSolverIngredientsTable();
+                solveDietLP();
+                closeViewDietModal();
+                showToast('Insumos de la dieta cargados en el formulador');
+            });
+
+            // Base de Datos de Insumos: búsqueda, edición e inserción
+            document.getElementById('db-search')?.addEventListener('input', renderDatabaseTable);
+            document.getElementById('db-category-filter')?.addEventListener('change', renderDatabaseTable);
+
+            document.getElementById('db-ingredients-tbody')?.addEventListener('change', e => {
+                if (e.target.classList.contains('db-inline-price')) {
+                    const id = parseInt(e.target.dataset.id);
+                    const ing = ingredients.find(i => i.id === id);
+                    if (ing) {
+                        ing.precio = Math.max(0, parseFloat(e.target.value) || 0);
+                        saveIngredientsState();
+                        renderSolverIngredientsTable();
+                        showToast(`Precio actualizado: ${ing.nombre}`);
+                    }
+                }
+            });
+
+            document.getElementById('db-ingredients-tbody')?.addEventListener('click', e => {
+                const editBtn = e.target.closest('.btn-edit-ing');
+                if (editBtn) {
+                    const id = parseInt(editBtn.dataset.id);
+                    const ing = ingredients.find(i => i.id === id);
+                    if (!ing) return;
+                    document.getElementById('modal-ing-title').textContent = 'Editar Insumo';
+                    document.getElementById('ing-id').value = ing.id;
+                    document.getElementById('ing-nombre').value = ing.nombre;
+                    document.getElementById('ing-categoria').value = ing.categoria;
+                    document.getElementById('ing-precio').value = ing.precio;
+                    document.getElementById('ing-ms').value = ing.ms;
+                    document.getElementById('ing-pc').value = ing.pc;
+                    document.getElementById('ing-eng').value = ing.eng;
+                    document.getElementById('ing-enm').value = ing.enm;
+                    document.getElementById('ing-fdn').value = ing.fdn;
+                    document.getElementById('ing-min').value = ing.min;
+                    document.getElementById('ing-max').value = ing.max;
+                    document.getElementById('modal-ingredient').classList.remove('hidden');
+                    return;
+                }
+
+                const delBtn = e.target.closest('.btn-delete-ing');
+                if (delBtn) {
+                    const id = parseInt(delBtn.dataset.id);
+                    openConfirmModal('Eliminar insumo', '¿Deseas eliminar este ingrediente de la base de datos?', () => {
+                        ingredients = ingredients.filter(i => i.id !== id);
+                        saveIngredientsState();
+                        renderDatabaseTable();
+                        renderSolverIngredientsTable();
+                        showToast('Insumo eliminado');
+                    });
+                }
+            });
+
+            document.getElementById('btn-open-add-modal')?.addEventListener('click', () => {
+                document.getElementById('form-ingredient').reset();
+                document.getElementById('ing-id').value = '';
+                document.getElementById('modal-ing-title').textContent = 'Nuevo Insumo';
+                document.getElementById('modal-ingredient').classList.remove('hidden');
+            });
+
+            const closeIngModal = () => document.getElementById('modal-ingredient').classList.add('hidden');
+            document.getElementById('btn-close-ing-modal')?.addEventListener('click', closeIngModal);
+            document.getElementById('btn-cancel-ing-modal')?.addEventListener('click', closeIngModal);
+
+            document.getElementById('form-ingredient')?.addEventListener('submit', e => {
+                e.preventDefault();
+                const editId = document.getElementById('ing-id').value;
+                const payload = {
+                    nombre: document.getElementById('ing-nombre').value.trim(),
+                    categoria: document.getElementById('ing-categoria').value,
+                    precio: parseFloat(document.getElementById('ing-precio').value) || 0,
+                    ms: parseFloat(document.getElementById('ing-ms').value) || 88,
+                    pc: parseFloat(document.getElementById('ing-pc').value) || 0,
+                    eng: parseFloat(document.getElementById('ing-eng').value) || 0,
+                    enm: parseFloat(document.getElementById('ing-enm').value) || 0,
+                    fdn: parseFloat(document.getElementById('ing-fdn').value) || 0,
+                    min: parseFloat(document.getElementById('ing-min').value) || 0,
+                    max: parseFloat(document.getElementById('ing-max').value) || 100,
+                    activo: true,
+                    selected: true
+                };
+
+                if (editId) {
+                    const idx = ingredients.findIndex(i => i.id === parseInt(editId));
+                    if (idx !== -1) ingredients[idx] = { ...ingredients[idx], ...payload };
+                } else {
+                    const nextId = ingredients.reduce((m, i) => Math.max(m, i.id), 0) + 1;
+                    ingredients.push({ id: nextId, ...payload });
+                }
+
+                saveIngredientsState();
+                renderDatabaseTable();
+                renderSolverIngredientsTable();
+                closeIngModal();
+                showToast('Insumo guardado correctamente');
+            });
+
+            // Pastoreo Rotativo eventos
+            document.querySelectorAll('.pview-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const v = btn.dataset.pview;
+                    document.querySelectorAll('.pview-btn').forEach(b => {
+                        b.classList.remove('bg-white', 'text-forest-900', 'shadow-sm');
+                        b.classList.add('text-slate-600');
+                    });
+                    btn.classList.add('bg-white', 'text-forest-900', 'shadow-sm');
+                    btn.classList.remove('text-slate-600');
+
+                    if (v === 'mapa') {
+                        document.getElementById('pastoreo-view-mapa').classList.remove('hidden');
+                        document.getElementById('pastoreo-view-lista').classList.add('hidden');
+                    } else {
+                        document.getElementById('pastoreo-view-mapa').classList.add('hidden');
+                        document.getElementById('pastoreo-view-lista').classList.remove('hidden');
+                    }
+                });
+            });
+
+            document.getElementById('pastoreo-meta-dias')?.addEventListener('change', e => {
+                pastoreoState.metaDias = Math.max(1, parseInt(e.target.value) || 45);
+                savePastoreoState();
+                renderPastoreoModule();
+            });
+
+            document.getElementById('pastoreo-fecha-ref')?.addEventListener('change', e => {
+                if (e.target.value) {
+                    pastoreoState.fechaRef = e.target.value;
+                    savePastoreoState();
+                    renderPastoreoModule();
+                }
+            });
+
+            document.getElementById('pastoreo-filter-status')?.addEventListener('change', renderPastoreoModule);
+
+            document.getElementById('tab-pastoreo')?.addEventListener('click', e => {
+                const btn = e.target.closest('.btn-open-cuadro');
+                if (btn) {
+                    openCuadroModal(parseInt(btn.dataset.cid));
+                }
+            });
+
+            const closePModal = () => document.getElementById('modal-pastoreo').classList.add('hidden');
+            document.getElementById('btn-close-p-modal')?.addEventListener('click', closePModal);
+            document.getElementById('btn-cancel-p-modal')?.addEventListener('click', closePModal);
+
+            document.querySelectorAll('.quick-note-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const ta = document.getElementById('p-notas');
+                    const note = btn.dataset.quicknote;
+                    ta.value = ta.value ? `${ta.value} | ${note}` : note;
+                });
+            });
+
+            document.getElementById('btn-save-p-modal')?.addEventListener('click', () => {
+                const cid = parseInt(document.getElementById('p-cuadro-id').value);
+                const c = pastoreoState.cuadros.find(item => item.id === cid);
+                if (c) {
+                    c.fechaSalida = document.getElementById('p-fecha-salida').value || pastoreoState.fechaRef;
+                    c.notas = document.getElementById('p-notas').value.trim();
+                    savePastoreoState();
+                    renderPastoreoModule();
+                    showToast(`Cuadro #${cid} actualizado`);
+                }
+                closePModal();
+            });
+
+            document.getElementById('btn-meter-ganado-aqui')?.addEventListener('click', () => {
+                const cid = parseInt(document.getElementById('p-cuadro-id').value);
+                const prevId = pastoreoState.activoId;
+                const hoy = pastoreoState.fechaRef || new Date().toISOString().split('T')[0];
+
+                if (prevId && prevId !== cid) {
+                    const prevCuadro = pastoreoState.cuadros.find(item => item.id === prevId);
+                    if (prevCuadro) prevCuadro.fechaSalida = hoy;
+                }
+
+                const targetCuadro = pastoreoState.cuadros.find(item => item.id === cid);
+                if (targetCuadro) {
+                    targetCuadro.notas = document.getElementById('p-notas').value.trim();
+                }
+
+                pastoreoState.activoId = cid;
+                savePastoreoState();
+                renderPastoreoModule();
+                closePModal();
+                showToast(`Ganado movido al Cuadro #${cid}`);
+            });
+
+            document.getElementById('btn-export-pastoreo')?.addEventListener('click', () => {
+                const lines = ['Cuadro,Franja,Area (m2),Ultima Salida,Dias Descanso,Estatus,Notas'];
+                pastoreoState.cuadros.forEach(c => {
+                    const st = getCuadroStatus(c);
+                    lines.push(`${c.id},${c.franja},${c.area},${c.fechaSalida},${st.dias},"${st.label}","${(c.notas || '').replace(/"/g, '""')}"`);
+                });
+                const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8;' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `pastoreo_rotativo_${pastoreoState.fechaRef}.csv`;
+                a.click();
+                URL.revokeObjectURL(url);
+            });
+
+            // Modal Confirmación genérico
+            document.getElementById('btn-confirm-cancel')?.addEventListener('click', () => {
+                document.getElementById('modal-confirm').classList.add('hidden');
+                confirmCallback = null;
+            });
+            document.getElementById('btn-confirm-ok')?.addEventListener('click', () => {
+                document.getElementById('modal-confirm').classList.add('hidden');
+                if (typeof confirmCallback === 'function') confirmCallback();
+                confirmCallback = null;
+            });
+
+            // Restaurar datos originales
+            document.getElementById('btn-reset-data')?.addEventListener('click', () => {
+                openConfirmModal('Restaurar datos originales', 'Se restablecerán los 12 insumos y los 46 cuadros de pastoreo por defecto.', () => {
+                    ingredients = JSON.parse(JSON.stringify(DEFAULT_INGREDIENTS));
+                    pastoreoState = buildDefaultPastoreo();
+                    saveIngredientsState();
+                    savePastoreoState();
+                    renderSolverIngredientsTable();
+                    renderDatabaseTable();
+                    renderPastoreoModule();
+                    showToast('Datos originales restaurados');
+                });
+            });
+        }
+
+        // Arranque inicial de la aplicación
+        window.addEventListener('DOMContentLoaded', () => {
+            loadLocalState();
+            calculateNutritionalRequirements();
+            renderSolverIngredientsTable();
+            renderDatabaseTable();
+            renderPastoreoModule();
+            renderDietHistoryList();
+            bindUIEvents();
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        });
+    </script>
+
+    <!-- =================================================================== -->
+    <!-- FIREBASE FIRESTORE: SINCRONIZACIÓN EN TIEMPO REAL E HISTORIAL       -->
+    <!-- =================================================================== -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import {
+            getFirestore,
+            doc,
+            setDoc,
+            onSnapshot,
+            collection,
+            addDoc,
+            deleteDoc,
+            query,
+            orderBy
+        } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA15uMNGZz_wZO4he7kxsVyDM2qgrJwhXA",
+            authDomain: "ganadopro-rancho.firebaseapp.com",
+            projectId: "ganadopro-rancho",
+            storageBucket: "ganadopro-rancho.firebasestorage.app",
+            messagingSenderId: "621860326869",
+            appId: "1:621860326869:web:056eb9e59bdcab65d5415c"
+        };
+
+        const badge = document.getElementById('sync-status-badge');
+        const statusText = document.getElementById('sync-status-text');
+
+        function setSyncStatus(mode, text) {
+            if (!badge || !statusText) return;
+            statusText.textContent = text;
+            if (mode === 'ok') {
+                badge.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200';
+            } else {
+                badge.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200';
+            }
+        }
+
+        try {
+            const app = initializeApp(firebaseConfig);
+            const db = getFirestore(app);
+
+            const ingredientsDocRef = doc(db, 'rancho_config', 'insumos');
+            const pastoreoDocRef = doc(db, 'rancho_config', 'pastoreo');
+            const dietsColRef = collection(db, 'historial_dietas');
+
+            window.syncIngredientsToCloud = async (items) => {
+                try {
+                    await setDoc(ingredientsDocRef, { items, updatedAt: Date.now() });
+                } catch (err) {
+                    console.warn('Error sincronizando insumos:', err);
+                }
+            };
+
+            window.syncPastoreoToCloud = async (state) => {
+                try {
+                    await setDoc(pastoreoDocRef, { ...state, updatedAt: Date.now() });
+                } catch (err) {
+                    console.warn('Error sincronizando pastoreo:', err);
+                }
+            };
+
+            window.saveDietToCloud = async (dietRecord) => {
+                await addDoc(dietsColRef, dietRecord);
+            };
+
+            window.deleteDietFromCloud = async (dietId) => {
+                await deleteDoc(doc(db, 'historial_dietas', dietId));
+            };
+
+            // Escuchar cambios en tiempo real de Insumos
+            onSnapshot(ingredientsDocRef, (snap) => {
+                setSyncStatus('ok', 'Nube activa (en vivo)');
+                if (snap.exists() && Array.isArray(snap.data().items)) {
+                    isApplyingRemoteState = true;
+                    ingredients = snap.data().items;
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(ingredients));
+                    renderSolverIngredientsTable();
+                    renderDatabaseTable();
+                    isApplyingRemoteState = false;
+                } else {
+                    window.syncIngredientsToCloud(ingredients);
+                }
+            }, (err) => {
+                console.warn('Firestore insumos listener:', err);
+                setSyncStatus('warn', 'Modo local (revisar reglas Firestore)');
+            });
+
+            // Escuchar cambios en tiempo real de Pastoreo Rotativo
+            onSnapshot(pastoreoDocRef, (snap) => {
+                setSyncStatus('ok', 'Nube activa (en vivo)');
+                if (snap.exists() && Array.isArray(snap.data().cuadros)) {
+                    isApplyingRemoteState = true;
+                    const data = snap.data();
+                    pastoreoState = {
+                        metaDias: data.metaDias || 45,
+                        fechaRef: data.fechaRef || new Date().toISOString().split('T')[0],
+                        activoId: data.activoId || 1,
+                        cuadros: data.cuadros
+                    };
+                    localStorage.setItem(PASTOREO_STORAGE_KEY, JSON.stringify(pastoreoState));
+                    renderPastoreoModule();
+                    isApplyingRemoteState = false;
+                } else {
+                    window.syncPastoreoToCloud(pastoreoState);
+                }
+            }, (err) => {
+                console.warn('Firestore pastoreo listener:', err);
+            });
+
+            // Escuchar cambios en tiempo real del Histórico de Dietas
+            const dietsQuery = query(dietsColRef, orderBy('createdAt', 'desc'));
+            onSnapshot(dietsQuery, (snapshot) => {
+                dietHistory = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                renderDietHistoryList();
+            }, (err) => {
+                console.warn('Firestore historial listener:', err);
+            });
+
+        } catch (e) {
+            console.error('Error inicializando Firebase:', e);
+            setSyncStatus('warn', 'Sin conexión a Firebase');
+        }
+    </script>
+</body>
+</html>
