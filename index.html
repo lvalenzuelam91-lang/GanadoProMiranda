@@ -195,7 +195,11 @@
                     <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Formulación de Dieta al Menor Costo</h2>
                     <p class="text-sm text-slate-500 mt-1">Configura el perfil del ganado, ajusta los insumos disponibles y optimiza la ración con programación lineal.</p>
                 </div>
-                <div class="flex items-center gap-2 no-print">
+                <div class="flex flex-wrap items-center gap-2 no-print">
+                    <button id="btn-new-recipe" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 shadow-sm transition-colors" title="Limpiar formulador para crear una receta nueva">
+                        <i data-lucide="file-plus-2" class="w-3.5 h-3.5 text-forest-700"></i>
+                        <span>Nueva Receta / Limpiar</span>
+                    </button>
                     <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-forest-50 text-forest-700 border border-forest-100">
                         <span class="w-2 h-2 rounded-full bg-forest-500 animate-pulse"></span>
                         Solver Simplex Listo
@@ -2352,6 +2356,44 @@
             document.getElementById('form-save-diet')?.addEventListener('submit', async e => {
                 e.preventDefault();
                 if (!lastSolution) return;
+                const fullStateSnapshot = {
+                    animal: {
+                        proposito: document.getElementById('animal-proposito').value,
+                        sexo: document.getElementById('animal-sexo').value,
+                        raza: document.getElementById('animal-raza').value,
+                        peso: parseFloat(document.getElementById('animal-peso').value) || 320,
+                        edad: parseInt(document.getElementById('animal-edad').value) || 10,
+                        gdp: parseFloat(document.getElementById('animal-gdp').value) || 1.5,
+                        leche: parseFloat(document.getElementById('animal-leche').value) || 22,
+                        temp: parseFloat(document.getElementById('animal-temp').value) || 28,
+                        implante: document.getElementById('animal-implante').checked
+                    },
+                    requirements: {
+                        cms: parseFloat(document.getElementById('req-cms').value) || 8.48,
+                        pc: parseFloat(document.getElementById('req-pc').value) || 14.5,
+                        en: parseFloat(document.getElementById('req-en').value) || 1.18,
+                        fdn: parseFloat(document.getElementById('req-fdn').value) || 13.0
+                    },
+                    ingredientsConfig: ingredients.map(ing => ({
+                        id: ing.id,
+                        nombre: ing.nombre,
+                        precio: ing.precio,
+                        min: ing.min,
+                        max: ing.max,
+                        selected: ing.selected
+                    })),
+                    scale: {
+                        currentScale,
+                        loteCabezas: parseInt(document.getElementById('lote-cabezas').value) || 30
+                    },
+                    profitability: {
+                        pesoIni: parseFloat(document.getElementById('rent-peso-ini').value) || 320,
+                        pesoFin: parseFloat(document.getElementById('rent-peso-fin').value) || 520,
+                        precioPie: parseFloat(document.getElementById('rent-precio-pie').value) || 75
+                    },
+                    solutionSnapshot: JSON.parse(JSON.stringify(lastSolution))
+                };
+
                 const dietRecord = {
                     nombre: document.getElementById('diet-nombre').value.trim(),
                     lote: document.getElementById('diet-lote').value.trim(),
@@ -2363,6 +2405,7 @@
                     totalEN: lastSolution.totalEN,
                     totalFDN: lastSolution.totalFDN,
                     items: lastSolution.items,
+                    fullState: fullStateSnapshot,
                     createdAt: Date.now()
                 };
 
@@ -2374,7 +2417,7 @@
                     renderDietHistoryList();
                 }
                 closeSaveDietModal();
-                showToast('Dieta guardada en el historial');
+                showToast('Dieta y perfil completo guardados en el historial');
             });
 
             // Eventos de lista de historial de dietas
@@ -2405,15 +2448,156 @@
 
             document.getElementById('btn-reload-diet-from-modal')?.addEventListener('click', () => {
                 if (!selectedHistoryDiet) return;
-                const usedIds = new Set((selectedHistoryDiet.items || []).map(i => i.id));
-                ingredients.forEach(ing => {
-                    ing.selected = usedIds.has(ing.id);
-                });
-                saveIngredientsState();
-                renderSolverIngredientsTable();
-                solveDietLP();
+                const fs = selectedHistoryDiet.fullState;
+
+                if (fs) {
+                    // 1. Restaurar Perfil del Animal y Manejo
+                    if (fs.animal) {
+                        document.getElementById('animal-proposito').value = fs.animal.proposito || 'desarrollo';
+                        document.getElementById('animal-sexo').value = fs.animal.sexo || 'macho_entero';
+                        document.getElementById('animal-raza').value = fs.animal.raza || 'cruza';
+                        document.getElementById('animal-peso').value = fs.animal.peso ?? 320;
+                        document.getElementById('animal-edad').value = fs.animal.edad ?? 10;
+                        document.getElementById('animal-gdp').value = fs.animal.gdp ?? 1.5;
+                        document.getElementById('animal-leche').value = fs.animal.leche ?? 22;
+                        document.getElementById('animal-temp').value = fs.animal.temp ?? 28;
+                        document.getElementById('animal-implante').checked = Boolean(fs.animal.implante);
+                        calculateNutritionalRequirements();
+                    }
+
+                    // 2. Restaurar Requerimientos Nutricionales exactos guardados
+                    if (fs.requirements) {
+                        document.getElementById('req-cms').value = Number(fs.requirements.cms).toFixed(2);
+                        document.getElementById('req-pc').value = Number(fs.requirements.pc).toFixed(1);
+                        document.getElementById('req-en').value = Number(fs.requirements.en).toFixed(2);
+                        document.getElementById('req-fdn').value = Number(fs.requirements.fdn).toFixed(1);
+                    }
+
+                    // 3. Restaurar selección y límites de insumos
+                    if (Array.isArray(fs.ingredientsConfig)) {
+                        const cfgMap = new Map(fs.ingredientsConfig.map(c => [c.id, c]));
+                        ingredients.forEach(ing => {
+                            const savedCfg = cfgMap.get(ing.id);
+                            if (savedCfg) {
+                                ing.selected = Boolean(savedCfg.selected);
+                                ing.min = savedCfg.min;
+                                ing.max = savedCfg.max;
+                            } else {
+                                ing.selected = false;
+                            }
+                        });
+                    }
+
+                    // 4. Restaurar Escala de Mezcla y Cabezas
+                    if (fs.scale) {
+                        currentScale = fs.scale.currentScale || '100ms';
+                        document.getElementById('lote-cabezas').value = fs.scale.loteCabezas || 30;
+                        document.querySelectorAll('.scale-btn').forEach(b => {
+                            if (b.dataset.scale === currentScale) {
+                                b.classList.add('bg-white', 'text-forest-900', 'shadow-sm');
+                                b.classList.remove('text-slate-600');
+                            } else {
+                                b.classList.remove('bg-white', 'text-forest-900', 'shadow-sm');
+                                b.classList.add('text-slate-600');
+                            }
+                        });
+                        const loteBox = document.getElementById('lote-input-container');
+                        if (currentScale === 'lote') loteBox.classList.remove('hidden');
+                        else loteBox.classList.add('hidden');
+                    }
+
+                    // 5. Restaurar Parámetros de Rentabilidad
+                    if (fs.profitability) {
+                        document.getElementById('rent-peso-ini').value = fs.profitability.pesoIni ?? 320;
+                        document.getElementById('rent-peso-fin').value = fs.profitability.pesoFin ?? 520;
+                        document.getElementById('rent-precio-pie').value = fs.profitability.precioPie ?? 75;
+                    }
+
+                    saveIngredientsState();
+                    renderSolverIngredientsTable();
+
+                    // Mostrar directamente la solución guardada (o recalcular si falta el snapshot)
+                    if (fs.solutionSnapshot) {
+                        lastSolution = JSON.parse(JSON.stringify(fs.solutionSnapshot));
+                        document.getElementById('solver-error-box').classList.add('hidden');
+                        document.getElementById('results-section').classList.remove('hidden');
+                        renderSolutionResults();
+                        document.getElementById('results-section').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    } else {
+                        solveDietLP();
+                    }
+                } else {
+                    // Compatibilidad con recetas guardadas antes de esta actualización
+                    const usedIds = new Set((selectedHistoryDiet.items || []).map(i => i.id));
+                    ingredients.forEach(ing => {
+                        ing.selected = usedIds.has(ing.id);
+                    });
+                    if (selectedHistoryDiet.totalPC) document.getElementById('req-pc').value = Number(selectedHistoryDiet.totalPC).toFixed(1);
+                    if (selectedHistoryDiet.totalEN) document.getElementById('req-en').value = Number(selectedHistoryDiet.totalEN).toFixed(2);
+                    if (selectedHistoryDiet.totalFDN) document.getElementById('req-fdn').value = Number(selectedHistoryDiet.totalFDN).toFixed(1);
+                    saveIngredientsState();
+                    renderSolverIngredientsTable();
+                    solveDietLP();
+                }
+
                 closeViewDietModal();
-                showToast('Insumos de la dieta cargados en el formulador');
+                showToast(`Receta "${selectedHistoryDiet.nombre}" cargada completamente`);
+            });
+
+            // Botón Nueva Receta / Limpiar Formulador
+            document.getElementById('btn-new-recipe')?.addEventListener('click', () => {
+                openConfirmModal(
+                    'Nueva Receta / Limpiar Formulador',
+                    'Se restablecerá el perfil del animal, los límites de inclusión por defecto y se limpiará el resultado actual para iniciar una nueva dieta.',
+                    () => {
+                        // 1. Restablecer Perfil del Animal por defecto
+                        document.getElementById('animal-proposito').value = 'desarrollo';
+                        document.getElementById('animal-sexo').value = 'macho_entero';
+                        document.getElementById('animal-raza').value = 'cruza';
+                        document.getElementById('animal-peso').value = 320;
+                        document.getElementById('animal-edad').value = 10;
+                        document.getElementById('animal-gdp').value = 1.5;
+                        document.getElementById('animal-leche').value = 22;
+                        document.getElementById('animal-temp').value = 28;
+                        document.getElementById('animal-implante').checked = false;
+                        calculateNutritionalRequirements();
+
+                        // 2. Restablecer selección y límites (Mín/Máx) de insumos conservando tus precios actuales
+                        const defaultBoundsMap = new Map(DEFAULT_INGREDIENTS.map(d => [d.id, d]));
+                        ingredients.forEach(ing => {
+                            const def = defaultBoundsMap.get(ing.id);
+                            ing.selected = true;
+                            ing.min = def ? def.min : 0;
+                            ing.max = def ? def.max : 100;
+                        });
+                        saveIngredientsState();
+                        renderSolverIngredientsTable();
+
+                        // 3. Restablecer escala y rentabilidad
+                        currentScale = '100ms';
+                        document.getElementById('lote-cabezas').value = 30;
+                        document.getElementById('lote-input-container').classList.add('hidden');
+                        document.querySelectorAll('.scale-btn').forEach(b => {
+                            if (b.dataset.scale === '100ms') {
+                                b.classList.add('bg-white', 'text-forest-900', 'shadow-sm');
+                                b.classList.remove('text-slate-600');
+                            } else {
+                                b.classList.remove('bg-white', 'text-forest-900', 'shadow-sm');
+                                b.classList.add('text-slate-600');
+                            }
+                        });
+                        document.getElementById('rent-peso-ini').value = 320;
+                        document.getElementById('rent-peso-fin').value = 520;
+                        document.getElementById('rent-precio-pie').value = 75;
+
+                        // 4. Ocultar resultados y alertas previas
+                        lastSolution = null;
+                        document.getElementById('results-section').classList.add('hidden');
+                        document.getElementById('solver-error-box').classList.add('hidden');
+
+                        showToast('Formulador limpio y listo para una nueva receta');
+                    }
+                );
             });
 
             // Base de Datos de Insumos: búsqueda, edición e inserción
