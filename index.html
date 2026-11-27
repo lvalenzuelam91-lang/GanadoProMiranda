@@ -1394,22 +1394,29 @@
 
             if (proposito === 'recepcion') {
                 cmsPct = 2.35;
-                pcReq = 14.5;
-                enReq = 0.98;
-                fdnReq = 21.0;
-                nota = 'Etapa de recepción: 21% de FDN de forraje (≈30% de rastrojo en BS y 30-35% FDN total) para estabilizar el rumen tras el transporte.';
+                // En recepción (meta típica 0.70 - 1.10 kg/d), ENg oscila entre 0.75 y 0.90 Mcal/kg
+                const gdpClamped = Math.max(0.5, Math.min(1.4, gdp));
+                enReq = 0.75 + (gdpClamped - 0.75) * 0.24 + ((peso - 250) / 100) * 0.02;
+                enReq = Math.max(0.75, Math.min(0.95, enReq));
+                pcReq = 13.8 + (gdpClamped - 0.75) * 1.4;
+                fdnReq = Math.max(18.0, Math.min(25.0, 24.5 - (gdpClamped - 0.75) * 6.0));
+                nota = `Etapa de recepción (meta ${gdp.toFixed(2)} kg/d): ${fdnReq.toFixed(1)}% de FDN de forraje (≈${Math.round(fdnReq / 0.7)}% de rastrojo en BS) y ${enReq.toFixed(2)} Mcal ENg para estabilizar el rumen sin sobrecarga energética.`;
             } else if (proposito === 'desarrollo') {
                 cmsPct = 2.65;
-                pcReq = 14.2 + (gdp - 1.3) * 1.2;
-                enReq = Math.min(1.22, 1.15 + (gdp - 1.2) * 0.12);
-                fdnReq = 13.0;
-                nota = 'Etapa de desarrollo: 13% de FDN de forraje (≈19% de rastrojo en BS y 21-24% FDN total) para balancear salud ruminal y ganancia diaria.';
+                const gdpClamped = Math.max(0.9, Math.min(1.8, gdp));
+                enReq = 1.05 + (gdpClamped - 1.15) * 0.25 + ((peso - 300) / 100) * 0.02;
+                enReq = Math.max(1.02, Math.min(1.24, enReq));
+                pcReq = 13.6 + (gdpClamped - 1.15) * 1.6;
+                fdnReq = Math.max(11.0, Math.min(16.5, 14.5 - (gdpClamped - 1.20) * 4.0));
+                nota = `Etapa de desarrollo (meta ${gdp.toFixed(2)} kg/d): ${fdnReq.toFixed(1)}% de FDN de forraje (≈${Math.round(fdnReq / 0.7)}% de rastrojo en BS) y ${enReq.toFixed(2)} Mcal ENg para maximizar crecimiento muscular.`;
             } else if (proposito === 'finalizacion') {
                 cmsPct = 2.55;
-                pcReq = 13.0 + (gdp - 1.5) * 0.8;
-                enReq = Math.min(1.30, 1.26 + (gdp - 1.5) * 0.08);
-                fdnReq = 7.5;
-                nota = 'Etapa de finalización: 7.5% de FDN de forraje (≈11% de rastrojo en BS y 14-16% FDN total). Requiere adaptación gradual para evitar acidosis.';
+                const gdpClamped = Math.max(1.2, Math.min(2.2, gdp));
+                enReq = 1.20 + (gdpClamped - 1.45) * 0.22 + ((peso - 400) / 100) * 0.02;
+                enReq = Math.max(1.18, Math.min(1.32, enReq));
+                pcReq = 12.6 + (gdpClamped - 1.45) * 1.3;
+                fdnReq = Math.max(6.5, Math.min(10.0, 8.5 - (gdpClamped - 1.50) * 2.5));
+                nota = `Etapa de finalización (meta ${gdp.toFixed(2)} kg/d): ${fdnReq.toFixed(1)}% de FDN de forraje (≈${Math.round(fdnReq / 0.7)}% de rastrojo en BS) y ${enReq.toFixed(2)} Mcal ENg. Requiere transición gradual.`;
             } else if (proposito === 'lechero') {
                 cmsPct = 2.2 + (leche * 0.045);
                 pcReq = 15.5 + (leche - 20) * 0.12;
@@ -2385,8 +2392,24 @@
             document.getElementById('sidebar-backdrop')?.addEventListener('click', closeMobileMenu);
 
             // Recalcular requerimientos al cambiar perfil
-            ['animal-proposito', 'animal-sexo', 'animal-raza', 'animal-peso', 'animal-edad', 'animal-gdp', 'animal-leche', 'animal-temp', 'animal-implante'].forEach(id => {
-                document.getElementById(id)?.addEventListener('change', calculateNutritionalRequirements);
+            document.getElementById('animal-proposito')?.addEventListener('change', (e) => {
+                const prop = e.target.value;
+                const gdpInput = document.getElementById('animal-gdp');
+                if (gdpInput) {
+                    if (prop === 'recepcion') gdpInput.value = '0.85';
+                    else if (prop === 'desarrollo') gdpInput.value = '1.35';
+                    else if (prop === 'finalizacion') gdpInput.value = '1.65';
+                    else if (prop === 'mantenimiento') gdpInput.value = '0.40';
+                }
+                calculateNutritionalRequirements();
+            });
+
+            ['animal-sexo', 'animal-raza', 'animal-peso', 'animal-edad', 'animal-gdp', 'animal-leche', 'animal-temp', 'animal-implante'].forEach(id => {
+                const el = document.getElementById(id);
+                el?.addEventListener('change', calculateNutritionalRequirements);
+                if (el && el.tagName === 'INPUT' && el.type === 'number') {
+                    el.addEventListener('input', calculateNutritionalRequirements);
+                }
             });
             document.getElementById('btn-recalc-req')?.addEventListener('click', () => {
                 calculateNutritionalRequirements();
