@@ -90,6 +90,86 @@
 </head>
 <body class="bg-surface text-slate-800 antialiased overflow-x-hidden">
 
+    <!-- =================================================================== -->
+    <!-- PANTALLA DE ACCESO / SEGURIDAD Y AUTORIZACIÓN                       -->
+    <!-- =================================================================== -->
+    <div id="auth-gate-screen" class="fixed inset-0 z-[60] bg-gradient-to-br from-forest-950 via-forest-900 to-slate-900 flex items-center justify-center p-4 overflow-y-auto">
+        <div class="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden border border-white/10">
+            <!-- Header -->
+            <div class="bg-forest-900 px-6 py-6 text-white text-center relative">
+                <div class="w-14 h-14 rounded-2xl bg-forest-700/80 border border-forest-400/30 flex items-center justify-center mx-auto mb-3 shadow-inner">
+                    <i data-lucide="shield-check" class="w-8 h-8 text-forest-100"></i>
+                </div>
+                <h1 class="text-xl font-extrabold tracking-tight">GanadoPro</h1>
+                <p class="text-xs text-forest-100/80 mt-1">Sistema Privado de Nutrición y Gestión Ganadera</p>
+            </div>
+
+            <!-- Estado 1: Cargando sesión -->
+            <div id="auth-loading-box" class="p-8 text-center space-y-3">
+                <div class="w-8 h-8 border-4 border-forest-200 border-t-forest-800 rounded-full animate-spin mx-auto"></div>
+                <p class="text-sm font-medium text-slate-600">Verificando credenciales de seguridad...</p>
+            </div>
+
+            <!-- Estado 2: Formulario Login / Solicitud de Acceso -->
+            <div id="auth-form-box" class="hidden p-6 sm:p-7 space-y-5">
+                <div class="grid grid-cols-2 bg-slate-100 p-1 rounded-xl border border-slate-200/80">
+                    <button type="button" id="auth-tab-login" class="py-2 rounded-lg text-xs font-bold bg-white text-forest-900 shadow-sm transition-all">Iniciar Sesión</button>
+                    <button type="button" id="auth-tab-register" class="py-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition-all">Solicitar Acceso</button>
+                </div>
+
+                <div id="auth-alert" class="hidden p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-red-800 font-medium"></div>
+
+                <form id="auth-email-form" class="space-y-3.5">
+                    <div id="auth-name-group" class="hidden">
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Nombre completo</label>
+                        <input type="text" id="auth-name" placeholder="Ej. Juan Pérez (Encargado)" class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-forest-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Correo electrónico</label>
+                        <input type="email" id="auth-email" required placeholder="tu.correo@ejemplo.com" class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-forest-600">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 mb-1">Contraseña</label>
+                        <input type="password" id="auth-password" required minlength="6" placeholder="Mínimo 6 caracteres" class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-forest-600">
+                    </div>
+                    <button type="submit" id="auth-submit-btn" class="w-full py-3 rounded-xl bg-forest-900 hover:bg-forest-800 text-white font-bold text-sm shadow-md transition-colors">
+                        Entrar al Sistema
+                    </button>
+                </form>
+
+                <div class="relative flex py-1 items-center">
+                    <div class="flex-grow border-t border-slate-200"></div>
+                    <span class="flex-shrink mx-3 text-[11px] font-semibold uppercase text-slate-400">o continúa con</span>
+                    <div class="flex-grow border-t border-slate-200"></div>
+                </div>
+
+                <button type="button" id="btn-google-signin" class="w-full py-2.5 px-4 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-800 font-semibold text-sm flex items-center justify-center gap-2.5 shadow-sm transition-colors">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17Z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.11-6.72-4.96H1.29v3.14C3.26 21.3 7.31 24 12 24Z"/><path fill="#FBBC05" d="M5.28 14.24c-.24-.72-.38-1.49-.38-2.24s.14-1.52.38-2.24V6.62H1.29C.47 8.24 0 10.06 0 12s.47 3.76 1.29 5.38l3.99-3.14Z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.62l3.99 3.14c.95-2.85 3.6-4.96 6.72-4.96Z"/></svg>
+                    <span>Continuar con Google</span>
+                </button>
+            </div>
+
+            <!-- Estado 3: Acceso Pendiente de Aprobación -->
+            <div id="auth-pending-box" class="hidden p-7 text-center space-y-4">
+                <div class="w-14 h-14 rounded-2xl bg-amber-100 text-amber-700 flex items-center justify-center mx-auto">
+                    <i data-lucide="clock" class="w-7 h-7"></i>
+                </div>
+                <div>
+                    <h2 class="text-lg font-bold text-slate-900">Acceso Pendiente de Autorización</h2>
+                    <p class="text-xs text-slate-600 mt-1.5 leading-relaxed">
+                        Tu cuenta (<strong id="pending-user-email" class="text-slate-900"></strong>) ha sido registrada, pero requiere autorización del administrador principal del rancho para ingresar.
+                    </p>
+                </div>
+                <div class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-500">
+                    En cuanto el administrador apruebe tu acceso, esta pantalla se desbloqueará automáticamente.
+                </div>
+                <button type="button" id="btn-pending-signout" class="w-full py-2.5 rounded-xl border border-slate-300 text-slate-700 text-xs font-bold hover:bg-slate-50 transition-colors">
+                    Cerrar sesión / Usar otra cuenta
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Mobile Header -->
     <header class="lg:hidden fixed top-0 left-0 right-0 h-16 bg-forest-900 text-white flex items-center justify-between px-4 z-40 shadow-md no-print">
         <div class="flex items-center gap-2.5">
@@ -168,11 +248,28 @@
                 </div>
                 <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/30">Próximamente</span>
             </button>
+
+            <button id="nav-btn-usuarios" data-tab="usuarios" class="nav-btn hidden w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-medium transition-all text-forest-100/80 hover:bg-forest-800 hover:text-white">
+                <div class="flex items-center gap-3">
+                    <i data-lucide="users" class="w-5 h-5 shrink-0"></i>
+                    <span>Control de Accesos</span>
+                </div>
+                <span id="pending-users-badge" class="hidden text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400 text-slate-950">0</span>
+            </button>
         </nav>
 
-        <!-- Footer / Reset Data -->
-        <div class="p-4 border-t border-white/10 space-y-3">
-            <button id="btn-reset-data" class="w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl text-xs font-medium bg-white/5 hover:bg-white/10 text-forest-100 border border-white/10 transition-colors">
+        <!-- Footer / Usuario y Reset Data -->
+        <div class="p-4 border-t border-white/10 space-y-2.5">
+            <div class="px-3 py-2 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-2">
+                <div class="min-w-0">
+                    <p id="sidebar-user-email" class="text-[11px] font-semibold text-white truncate">Usuario</p>
+                    <p id="sidebar-user-role" class="text-[10px] text-emerald-300">Autorizado</p>
+                </div>
+                <button id="btn-signout" class="p-1.5 rounded-lg bg-white/10 hover:bg-red-500/80 text-white transition-colors shrink-0" title="Cerrar sesión">
+                    <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+                </button>
+            </div>
+            <button id="btn-reset-data" class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-medium bg-white/5 hover:bg-white/10 text-forest-100 border border-white/10 transition-colors">
                 <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
                 <span>Restaurar datos originales</span>
             </button>
@@ -876,6 +973,38 @@
                 <p class="text-sm text-slate-500 mt-2 leading-relaxed">
                     Controla compras de insumos, medicamentos, mano de obra y calcula el costo real por kilogramo producido al cierre de cada ciclo de engorda.
                 </p>
+            </div>
+        </section>
+
+        <!-- =================================================================== -->
+        <!-- MÓDULO ADMIN: CONTROL DE ACCESOS Y USUARIOS AUTORIZADOS             -->
+        <!-- =================================================================== -->
+        <section id="tab-usuarios" class="tab-content hidden space-y-6">
+            <div>
+                <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Control de Accesos y Usuarios</h2>
+                <p class="text-sm text-slate-500 mt-1">Solo los usuarios aprobados por el administrador principal (<span class="font-semibold text-slate-700">l.valenzuelam91@gmail.com</span>) pueden ingresar al sistema.</p>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+                <div class="p-4 border-b border-slate-100 flex items-center justify-between">
+                    <h3 class="font-bold text-slate-900 text-base">Solicitudes y Usuarios Registrados</h3>
+                    <span id="total-users-count" class="text-xs font-semibold px-3 py-1 rounded-full bg-slate-100 text-slate-700">0 usuarios</span>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                                <th class="py-3 px-4">Usuario / Nombre</th>
+                                <th class="py-3 px-4">Correo Electrónico</th>
+                                <th class="py-3 px-4">Estatus</th>
+                                <th class="py-3 px-4 text-right">Acción de Administrador</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-users-tbody" class="divide-y divide-slate-100 text-sm">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </section>
 
@@ -2844,12 +2973,26 @@
     <!-- =================================================================== -->
     <!-- FIREBASE FIRESTORE: SINCRONIZACIÓN EN TIEMPO REAL E HISTORIAL       -->
     <!-- =================================================================== -->
+    <!-- FIREBASE AUTH + FIRESTORE: SEGURIDAD Y SINCRONIZACIÓN EN TIEMPO REAL-->
+    <!-- =================================================================== -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
         import {
+            getAuth,
+            onAuthStateChanged,
+            signInWithEmailAndPassword,
+            createUserWithEmailAndPassword,
+            updateProfile,
+            GoogleAuthProvider,
+            signInWithPopup,
+            signOut
+        } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+        import {
             getFirestore,
             doc,
+            getDoc,
             setDoc,
+            updateDoc,
             onSnapshot,
             collection,
             addDoc,
@@ -2857,6 +3000,8 @@
             query,
             orderBy
         } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+
+        const ADMIN_EMAIL = 'l.valenzuelam91@gmail.com';
 
         const firebaseConfig = {
             apiKey: "AIzaSyA15uMNGZz_wZO4he7kxsVyDM2qgrJwhXA",
@@ -2880,90 +3025,329 @@
             }
         }
 
+        // UI de Pantalla de Login / Registro
+        let authMode = 'login'; // 'login' | 'register'
+        const authGate = document.getElementById('auth-gate-screen');
+        const authLoadingBox = document.getElementById('auth-loading-box');
+        const authFormBox = document.getElementById('auth-form-box');
+        const authPendingBox = document.getElementById('auth-pending-box');
+        const authAlert = document.getElementById('auth-alert');
+
+        function showAuthAlert(msg) {
+            authAlert.textContent = msg;
+            authAlert.classList.remove('hidden');
+        }
+
+        function clearAuthAlert() {
+            authAlert.classList.add('hidden');
+        }
+
+        document.getElementById('auth-tab-login')?.addEventListener('click', () => {
+            authMode = 'login';
+            clearAuthAlert();
+            document.getElementById('auth-tab-login').className = 'py-2 rounded-lg text-xs font-bold bg-white text-forest-900 shadow-sm transition-all';
+            document.getElementById('auth-tab-register').className = 'py-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition-all';
+            document.getElementById('auth-name-group').classList.add('hidden');
+            document.getElementById('auth-submit-btn').textContent = 'Entrar al Sistema';
+        });
+
+        document.getElementById('auth-tab-register')?.addEventListener('click', () => {
+            authMode = 'register';
+            clearAuthAlert();
+            document.getElementById('auth-tab-register').className = 'py-2 rounded-lg text-xs font-bold bg-white text-forest-900 shadow-sm transition-all';
+            document.getElementById('auth-tab-login').className = 'py-2 rounded-lg text-xs font-bold text-slate-600 hover:text-slate-900 transition-all';
+            document.getElementById('auth-name-group').classList.remove('hidden');
+            document.getElementById('auth-submit-btn').textContent = 'Crear Cuenta y Solicitar Acceso';
+        });
+
         try {
             const app = initializeApp(firebaseConfig);
+            const auth = getAuth(app);
             const db = getFirestore(app);
+            const googleProvider = new GoogleAuthProvider();
 
-            const ingredientsDocRef = doc(db, 'rancho_config', 'insumos');
-            const pastoreoDocRef = doc(db, 'rancho_config', 'pastoreo');
-            const dietsColRef = collection(db, 'historial_dietas');
+            let dataListenersStarted = false;
+            let unsubUserStatus = null;
+            let unsubAdminUsers = null;
 
-            window.syncIngredientsToCloud = async (items) => {
+            // Submit correo y contraseña
+            document.getElementById('auth-email-form')?.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                clearAuthAlert();
+                const email = document.getElementById('auth-email').value.trim();
+                const password = document.getElementById('auth-password').value;
+                const name = document.getElementById('auth-name').value.trim();
+                const btn = document.getElementById('auth-submit-btn');
+
+                btn.disabled = true;
+                btn.textContent = 'Procesando...';
+
                 try {
-                    await setDoc(ingredientsDocRef, { items, updatedAt: Date.now() });
+                    if (authMode === 'login') {
+                        await signInWithEmailAndPassword(auth, email, password);
+                    } else {
+                        const cred = await createUserWithEmailAndPassword(auth, email, password);
+                        if (name) {
+                            await updateProfile(cred.user, { displayName: name });
+                        }
+                    }
                 } catch (err) {
-                    console.warn('Error sincronizando insumos:', err);
+                    let friendly = 'No se pudo iniciar sesión. Verifica tus datos.';
+                    if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') {
+                        friendly = 'Correo o contraseña incorrectos. Si aún no tienes cuenta, usa "Solicitar Acceso".';
+                    } else if (err.code === 'auth/email-already-in-use') {
+                        friendly = 'Este correo ya está registrado. Cambia a "Iniciar Sesión".';
+                    } else if (err.code === 'auth/weak-password') {
+                        friendly = 'La contraseña debe tener al menos 6 caracteres.';
+                    }
+                    showAuthAlert(friendly);
+                } finally {
+                    btn.disabled = false;
+                    btn.textContent = authMode === 'login' ? 'Entrar al Sistema' : 'Crear Cuenta y Solicitar Acceso';
                 }
-            };
-
-            window.syncPastoreoToCloud = async (state) => {
-                try {
-                    await setDoc(pastoreoDocRef, { ...state, updatedAt: Date.now() });
-                } catch (err) {
-                    console.warn('Error sincronizando pastoreo:', err);
-                }
-            };
-
-            window.saveDietToCloud = async (dietRecord) => {
-                await addDoc(dietsColRef, dietRecord);
-            };
-
-            window.deleteDietFromCloud = async (dietId) => {
-                await deleteDoc(doc(db, 'historial_dietas', dietId));
-            };
-
-            // Escuchar cambios en tiempo real de Insumos
-            onSnapshot(ingredientsDocRef, (snap) => {
-                setSyncStatus('ok', 'Nube activa (en vivo)');
-                if (snap.exists() && Array.isArray(snap.data().items)) {
-                    isApplyingRemoteState = true;
-                    ingredients = snap.data().items;
-                    localStorage.setItem(STORAGE_KEY, JSON.stringify(ingredients));
-                    renderSolverIngredientsTable();
-                    renderDatabaseTable();
-                    isApplyingRemoteState = false;
-                } else {
-                    window.syncIngredientsToCloud(ingredients);
-                }
-            }, (err) => {
-                console.warn('Firestore insumos listener:', err);
-                setSyncStatus('warn', 'Modo local (revisar reglas Firestore)');
             });
 
-            // Escuchar cambios en tiempo real de Pastoreo Rotativo
-            onSnapshot(pastoreoDocRef, (snap) => {
-                setSyncStatus('ok', 'Nube activa (en vivo)');
-                if (snap.exists() && Array.isArray(snap.data().cuadros)) {
-                    isApplyingRemoteState = true;
-                    const data = snap.data();
-                    pastoreoState = {
-                        metaDias: data.metaDias || 45,
-                        fechaRef: data.fechaRef || new Date().toISOString().split('T')[0],
-                        activoId: data.activoId || 1,
-                        cuadros: data.cuadros
-                    };
-                    localStorage.setItem(PASTOREO_STORAGE_KEY, JSON.stringify(pastoreoState));
-                    renderPastoreoModule();
-                    isApplyingRemoteState = false;
-                } else {
-                    window.syncPastoreoToCloud(pastoreoState);
+            // Botón Google
+            document.getElementById('btn-google-signin')?.addEventListener('click', async () => {
+                clearAuthAlert();
+                try {
+                    await signInWithPopup(auth, googleProvider);
+                } catch (err) {
+                    showAuthAlert('No se pudo completar el acceso con Google. Verifica si tu navegador bloqueó la ventana emergente.');
                 }
-            }, (err) => {
-                console.warn('Firestore pastoreo listener:', err);
             });
 
-            // Escuchar cambios en tiempo real del Histórico de Dietas
-            const dietsQuery = query(dietsColRef, orderBy('createdAt', 'desc'));
-            onSnapshot(dietsQuery, (snapshot) => {
-                dietHistory = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
-                renderDietHistoryList();
-            }, (err) => {
-                console.warn('Firestore historial listener:', err);
+            // Botones Cerrar Sesión
+            const handleSignOut = async () => {
+                if (unsubUserStatus) { unsubUserStatus(); unsubUserStatus = null; }
+                if (unsubAdminUsers) { unsubAdminUsers(); unsubAdminUsers = null; }
+                await signOut(auth);
+            };
+            document.getElementById('btn-signout')?.addEventListener('click', handleSignOut);
+            document.getElementById('btn-pending-signout')?.addEventListener('click', handleSignOut);
+
+            function startFirestoreDataSync() {
+                if (dataListenersStarted) return;
+                dataListenersStarted = true;
+
+                const ingredientsDocRef = doc(db, 'rancho_config', 'insumos');
+                const pastoreoDocRef = doc(db, 'rancho_config', 'pastoreo');
+                const dietsColRef = collection(db, 'historial_dietas');
+
+                window.syncIngredientsToCloud = async (items) => {
+                    try {
+                        await setDoc(ingredientsDocRef, { items, updatedAt: Date.now() });
+                    } catch (err) {
+                        console.warn('Error sincronizando insumos:', err);
+                    }
+                };
+
+                window.syncPastoreoToCloud = async (state) => {
+                    try {
+                        await setDoc(pastoreoDocRef, { ...state, updatedAt: Date.now() });
+                    } catch (err) {
+                        console.warn('Error sincronizando pastoreo:', err);
+                    }
+                };
+
+                window.saveDietToCloud = async (dietRecord) => {
+                    await addDoc(dietsColRef, dietRecord);
+                };
+
+                window.deleteDietFromCloud = async (dietId) => {
+                    await deleteDoc(doc(db, 'historial_dietas', dietId));
+                };
+
+                onSnapshot(ingredientsDocRef, (snap) => {
+                    setSyncStatus('ok', 'Nube activa (en vivo)');
+                    if (snap.exists() && Array.isArray(snap.data().items)) {
+                        isApplyingRemoteState = true;
+                        ingredients = snap.data().items;
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(ingredients));
+                        renderSolverIngredientsTable();
+                        renderDatabaseTable();
+                        isApplyingRemoteState = false;
+                    } else {
+                        window.syncIngredientsToCloud(ingredients);
+                    }
+                }, (err) => {
+                    console.warn('Firestore insumos listener:', err);
+                    setSyncStatus('warn', 'Revisar reglas Firestore');
+                });
+
+                onSnapshot(pastoreoDocRef, (snap) => {
+                    setSyncStatus('ok', 'Nube activa (en vivo)');
+                    if (snap.exists() && Array.isArray(snap.data().cuadros)) {
+                        isApplyingRemoteState = true;
+                        const data = snap.data();
+                        pastoreoState = {
+                            metaDias: data.metaDias || 45,
+                            fechaRef: data.fechaRef || new Date().toISOString().split('T')[0],
+                            activoId: data.activoId || 1,
+                            cuadros: data.cuadros
+                        };
+                        localStorage.setItem(PASTOREO_STORAGE_KEY, JSON.stringify(pastoreoState));
+                        renderPastoreoModule();
+                        isApplyingRemoteState = false;
+                    } else {
+                        window.syncPastoreoToCloud(pastoreoState);
+                    }
+                }, (err) => {
+                    console.warn('Firestore pastoreo listener:', err);
+                });
+
+                const dietsQuery = query(dietsColRef, orderBy('createdAt', 'desc'));
+                onSnapshot(dietsQuery, (snapshot) => {
+                    dietHistory = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                    renderDietHistoryList();
+                }, (err) => {
+                    console.warn('Firestore historial listener:', err);
+                });
+            }
+
+            function startAdminUsersListener() {
+                if (unsubAdminUsers) unsubAdminUsers();
+                const usersCol = collection(db, 'usuarios_autorizados');
+                unsubAdminUsers = onSnapshot(usersCol, (snapshot) => {
+                    const users = snapshot.docs.map(d => ({ uid: d.id, ...d.data() }));
+                    users.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+                    const pendingCount = users.filter(u => !u.approved).length;
+                    const badgeEl = document.getElementById('pending-users-badge');
+                    if (badgeEl) {
+                        if (pendingCount > 0) {
+                            badgeEl.textContent = pendingCount;
+                            badgeEl.classList.remove('hidden');
+                        } else {
+                            badgeEl.classList.add('hidden');
+                        }
+                    }
+
+                    const countLabel = document.getElementById('total-users-count');
+                    if (countLabel) countLabel.textContent = `${users.length} usuarios`;
+
+                    const tbody = document.getElementById('admin-users-tbody');
+                    if (!tbody) return;
+                    tbody.innerHTML = '';
+
+                    users.forEach(u => {
+                        const isMainAdmin = (u.email || '').toLowerCase() === ADMIN_EMAIL;
+                        const tr = document.createElement('tr');
+                        tr.className = 'hover:bg-slate-50/80 transition-colors';
+                        tr.innerHTML = `
+                            <td class="py-3 px-4 font-semibold text-slate-900">${u.nombre || 'Sin nombre'}</td>
+                            <td class="py-3 px-4 text-slate-600">${u.email || ''}</td>
+                            <td class="py-3 px-4">
+                                ${isMainAdmin
+                                    ? '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-forest-100 text-forest-900">Administrador Principal</span>'
+                                    : u.approved
+                                        ? '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">Autorizado</span>'
+                                        : '<span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800">Pendiente</span>'
+                                }
+                            </td>
+                            <td class="py-3 px-4 text-right">
+                                ${isMainAdmin
+                                    ? '<span class="text-xs text-slate-400">Acceso permanente</span>'
+                                    : u.approved
+                                        ? `<button type="button" data-uid="${u.uid}" data-action="revoke" class="btn-toggle-user-access px-3 py-1.5 rounded-lg bg-red-50 hover:bg-red-100 text-red-700 text-xs font-semibold transition-colors">Revocar acceso</button>`
+                                        : `<button type="button" data-uid="${u.uid}" data-action="approve" class="btn-toggle-user-access px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-sm transition-colors">Aprobar acceso</button>`
+                                }
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                });
+
+                document.getElementById('admin-users-tbody')?.addEventListener('click', async (e) => {
+                    const btn = e.target.closest('.btn-toggle-user-access');
+                    if (!btn) return;
+                    const uid = btn.dataset.uid;
+                    const approve = btn.dataset.action === 'approve';
+                    try {
+                        await updateDoc(doc(db, 'usuarios_autorizados', uid), { approved: approve });
+                        showToast(approve ? 'Acceso aprobado al usuario' : 'Acceso revocado');
+                    } catch (err) {
+                        console.error('Error actualizando permiso:', err);
+                    }
+                });
+            }
+
+            // Observador central de Autenticación
+            onAuthStateChanged(auth, async (user) => {
+                authLoadingBox.classList.add('hidden');
+
+                if (!user) {
+                    authGate.classList.remove('hidden');
+                    authFormBox.classList.remove('hidden');
+                    authPendingBox.classList.add('hidden');
+                    document.getElementById('nav-btn-usuarios')?.classList.add('hidden');
+                    return;
+                }
+
+                const emailLower = (user.email || '').toLowerCase();
+                const isAdmin = emailLower === ADMIN_EMAIL;
+                const userDocRef = doc(db, 'usuarios_autorizados', user.uid);
+
+                // Registrar o asegurar ficha del usuario en Firestore
+                try {
+                    const snap = await getDoc(userDocRef);
+                    if (!snap.exists()) {
+                        await setDoc(userDocRef, {
+                            email: user.email || '',
+                            nombre: user.displayName || (isAdmin ? 'Administrador Principal' : 'Usuario Solicitante'),
+                            approved: isAdmin,
+                            role: isAdmin ? 'admin' : 'user',
+                            createdAt: Date.now()
+                        });
+                    } else if (isAdmin && !snap.data().approved) {
+                        await updateDoc(userDocRef, { approved: true, role: 'admin' });
+                    }
+                } catch (err) {
+                    console.warn('No se pudo verificar documento de usuario en Firestore:', err);
+                }
+
+                // Escuchar en tiempo real si el usuario está aprobado
+                if (unsubUserStatus) unsubUserStatus();
+                unsubUserStatus = onSnapshot(userDocRef, (snap) => {
+                    const approved = isAdmin || (snap.exists() && snap.data().approved === true);
+
+                    if (approved) {
+                        authGate.classList.add('hidden');
+                        document.getElementById('sidebar-user-email').textContent = user.email || 'Usuario';
+                        document.getElementById('sidebar-user-role').textContent = isAdmin ? 'Administrador Principal' : 'Usuario Autorizado';
+
+                        if (isAdmin) {
+                            document.getElementById('nav-btn-usuarios')?.classList.remove('hidden');
+                            startAdminUsersListener();
+                        } else {
+                            document.getElementById('nav-btn-usuarios')?.classList.add('hidden');
+                        }
+
+                        startFirestoreDataSync();
+                    } else {
+                        authGate.classList.remove('hidden');
+                        authFormBox.classList.add('hidden');
+                        authPendingBox.classList.remove('hidden');
+                        document.getElementById('pending-user-email').textContent = user.email || '';
+                        if (typeof lucide !== 'undefined') lucide.createIcons();
+                    }
+                }, (err) => {
+                    // Si aún no se ajustan reglas de Firestore, permitir paso solo al Admin principal
+                    if (isAdmin) {
+                        authGate.classList.add('hidden');
+                        document.getElementById('sidebar-user-email').textContent = user.email || '';
+                        document.getElementById('sidebar-user-role').textContent = 'Administrador Principal';
+                        document.getElementById('nav-btn-usuarios')?.classList.remove('hidden');
+                        startFirestoreDataSync();
+                    }
+                });
             });
 
         } catch (e) {
-            console.error('Error inicializando Firebase:', e);
-            setSyncStatus('warn', 'Sin conexión a Firebase');
+            console.error('Error inicializando Firebase Auth/Firestore:', e);
+            authLoadingBox.classList.add('hidden');
+            authFormBox.classList.remove('hidden');
+            showAuthAlert('Error de conexión con Firebase.');
         }
     </script>
 </body>
