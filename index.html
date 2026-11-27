@@ -2985,6 +2985,8 @@
             updateProfile,
             GoogleAuthProvider,
             signInWithPopup,
+            signInWithRedirect,
+            getRedirectResult,
             signOut
         } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
         import {
@@ -3065,6 +3067,18 @@
             const auth = getAuth(app);
             const db = getFirestore(app);
             const googleProvider = new GoogleAuthProvider();
+            googleProvider.setCustomParameters({ prompt: 'select_account' });
+
+            // Capturar resultado al regresar de redirección de Google (en iPhone / móviles)
+            getRedirectResult(auth).catch((err) => {
+                if (err && err.code) {
+                    if (err.code === 'auth/unauthorized-domain') {
+                        showAuthAlert(`Dominio no autorizado (${window.location.hostname}). Agrégalo en Firebase > Authentication > Configuración > Dominios autorizados.`);
+                    } else {
+                        showAuthAlert(`No se pudo completar el acceso con Google (${err.code}).`);
+                    }
+                }
+            });
 
             let dataListenersStarted = false;
             let unsubUserStatus = null;
@@ -3092,28 +3106,44 @@
                         }
                     }
                 } catch (err) {
-                    let friendly = 'No se pudo iniciar sesión. Verifica tus datos.';
                     if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') {
-                        friendly = 'Correo o contraseña incorrectos. Si aún no tienes cuenta, usa "Solicitar Acceso".';
+                        showAuthAlert('Correo o contraseña incorrectos. Si es tu primera vez, usa la pestaña "Solicitar Acceso".');
                     } else if (err.code === 'auth/email-already-in-use') {
-                        friendly = 'Este correo ya está registrado. Cambia a "Iniciar Sesión".';
+                        showAuthAlert('Este correo ya está registrado. Cambia a "Iniciar Sesión".');
                     } else if (err.code === 'auth/weak-password') {
-                        friendly = 'La contraseña debe tener al menos 6 caracteres.';
+                        showAuthAlert('La contraseña debe tener al menos 6 caracteres.');
+                    } else {
+                        showAuthAlert(`No se pudo iniciar sesión (${err.code || 'error'}).`);
                     }
-                    showAuthAlert(friendly);
                 } finally {
                     btn.disabled = false;
                     btn.textContent = authMode === 'login' ? 'Entrar al Sistema' : 'Crear Cuenta y Solicitar Acceso';
                 }
             });
 
-            // Botón Google
+            // Botón Google (Redirección directa en iPhone/Móvil + Fallback automático)
             document.getElementById('btn-google-signin')?.addEventListener('click', async () => {
                 clearAuthAlert();
+                const isMobileOrStandalone = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || window.matchMedia('(display-mode: standalone)').matches;
+
                 try {
-                    await signInWithPopup(auth, googleProvider);
+                    if (isMobileOrStandalone) {
+                        await signInWithRedirect(auth, googleProvider);
+                    } else {
+                        await signInWithPopup(auth, googleProvider);
+                    }
                 } catch (err) {
-                    showAuthAlert('No se pudo completar el acceso con Google. Verifica si tu navegador bloqueó la ventana emergente.');
+                    if (err.code === 'auth/popup-blocked' || err.code === 'auth/operation-not-supported-in-this-environment') {
+                        try {
+                            await signInWithRedirect(auth, googleProvider);
+                        } catch (redirErr) {
+                            showAuthAlert(`No se pudo iniciar con Google (${redirErr.code || 'error de redirección'}).`);
+                        }
+                    } else if (err.code === 'auth/unauthorized-domain') {
+                        showAuthAlert(`Dominio no autorizado (${window.location.hostname}). Agrégalo en Firebase > Authentication > Configuración > Dominios autorizados.`);
+                    } else {
+                        showAuthAlert(`No se pudo completar el acceso con Google (${err.code || 'error'}).`);
+                    }
                 }
             });
 
