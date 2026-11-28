@@ -221,6 +221,14 @@
                 <span>Base de Datos de Insumos</span>
             </button>
 
+            <button data-tab="reglas" class="nav-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-medium transition-all text-forest-100/80 hover:bg-forest-800 hover:text-white">
+                <div class="flex items-center gap-3">
+                    <i data-lucide="book-open-check" class="w-5 h-5 shrink-0"></i>
+                    <span>Reglas de Engorde</span>
+                </div>
+                <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-200 border border-amber-400/30">NRC / UAM</span>
+            </button>
+
             <button data-tab="pastoreo" class="nav-btn w-full flex items-center justify-between px-3.5 py-3 rounded-xl text-sm font-medium transition-all text-forest-100/80 hover:bg-forest-800 hover:text-white">
                 <div class="flex items-center gap-3">
                     <i data-lucide="map" class="w-5 h-5 shrink-0"></i>
@@ -266,57 +274,52 @@
                     <p id="sidebar-user-role" class="text-[10px] text-emerald-300">Autorizado</p>
                 </div>
                 <button id="btn-signout" class="p-1.5 rounded-lg bg-white/10 hover:bg-red-500/80 text-white transition-colors shrink-0" title="Cerrar sesión">
-                    <i data-lucide="log-out" class="w-3.5 h-3.5"></i>
+                    <i data-lucide="log-out" class="w-4 h-4"></i>
                 </button>
             </div>
-            <button id="btn-reset-data" class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-medium bg-white/5 hover:bg-white/10 text-forest-100 border border-white/10 transition-colors">
+            <button id="btn-reset-data" class="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-xs font-medium text-forest-100/80 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 transition-colors">
                 <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
                 <span>Restaurar datos originales</span>
             </button>
-            <div class="text-[11px] text-center text-forest-100/50">
-                Solver Simplex • NRC/NASEM
-            </div>
         </div>
     </aside>
 
-    <!-- Main Content Area -->
-    <main class="lg:ml-72 pt-20 lg:pt-8 pb-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto min-h-screen">
+    <!-- =================================================================== -->
+    <!-- CONTENIDO PRINCIPAL                                                 -->
+    <!-- =================================================================== -->
+    <main class="lg:ml-72 min-h-screen pt-16 lg:pt-0 p-4 sm:p-6 lg:p-8 max-w-[1600px]">
 
         <!-- =================================================================== -->
-        <!-- MÓDULO 2: FORMULACIÓN DE DIETA (ACTIVO POR DEFECTO)                 -->
+        <!-- MÓDULO 2: FORMULACIÓN DE DIETA (SOLVER DE MÍNIMO COSTO)             -->
         <!-- =================================================================== -->
         <section id="tab-formulacion" class="tab-content space-y-6">
-            <!-- Header -->
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <!-- Header de Sección -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 no-print">
                 <div>
                     <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Formulación de Dieta al Menor Costo</h2>
-                    <p class="text-sm text-slate-500 mt-1">Configura el perfil del ganado, ajusta los insumos disponibles y optimiza la ración con programación lineal.</p>
+                    <p class="text-sm text-slate-500 mt-1">Calcula raciones exactas con Programación Lineal (Simplex) basadas en estándares NRC/NASEM y el Manual UAM.</p>
                 </div>
-                <div class="flex flex-wrap items-center gap-2 no-print">
-                    <button id="btn-new-recipe" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 shadow-sm transition-colors" title="Limpiar formulador para crear una receta nueva">
-                        <i data-lucide="file-plus-2" class="w-3.5 h-3.5 text-forest-700"></i>
-                        <span>Nueva Receta / Limpiar</span>
+                <div class="flex flex-wrap items-center gap-2">
+                    <span id="sync-status-badge" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200">
+                        <span class="w-2 h-2 rounded-full bg-current"></span>
+                        <span id="sync-status-text">Conectando nube...</span>
+                    </span>
+                    <button id="btn-new-recipe" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold transition-colors shadow-sm">
+                        <i data-lucide="file-plus-2" class="w-4 h-4"></i>
+                        <span>Nueva Receta</span>
                     </button>
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-forest-50 text-forest-700 border border-forest-100">
-                        <span class="w-2 h-2 rounded-full bg-forest-500 animate-pulse"></span>
-                        Solver Simplex Listo
-                    </span>
-                    <span id="sync-status-badge" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200">
-                        <i data-lucide="cloud" class="w-3.5 h-3.5 text-emerald-600"></i>
-                        <span id="sync-status-text">Sincronizado en la nube</span>
-                    </span>
                 </div>
             </div>
 
             <!-- PASO 1: PERFIL DEL ANIMAL Y REQUERIMIENTOS -->
-            <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+            <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 no-print">
                 <!-- Perfil del Animal (7 cols) -->
                 <div class="xl:col-span-7 bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 sm:p-6">
                     <div class="flex items-center gap-2.5 mb-5 pb-3 border-b border-slate-100">
                         <span class="w-7 h-7 rounded-lg bg-forest-900 text-white text-xs font-bold flex items-center justify-center">1</span>
                         <div>
                             <h3 class="font-semibold text-slate-900 text-base">Perfil del Animal y Manejo</h3>
-                            <p class="text-xs text-slate-500">Basado en NRC/NASEM y Manual de Bovinos (Mendoza & Ricalde)</p>
+                            <p class="text-xs text-slate-500">Define etapa, clase fisiológica, raza, talla y peso para calcular requerimientos precisos.</p>
                         </div>
                     </div>
 
@@ -333,13 +336,14 @@
                             </select>
                         </div>
 
-                        <!-- Sexo -->
+                        <!-- Sexo / Clase Fisiológica -->
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Sexo</label>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Clase / Sexo</label>
                             <select id="animal-sexo" class="w-full rounded-xl border border-slate-300 bg-slate-50/50 px-3.5 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-forest-600">
                                 <option value="macho_entero" selected>Macho Entero (Toro)</option>
                                 <option value="novillo">Novillo (Castrado)</option>
-                                <option value="hembra">Hembra (Vaquilla / Vaca)</option>
+                                <option value="novilla">Novilla / Vaquilla (Crecimiento)</option>
+                                <option value="vaca_vieja">Vaca Vieja / Desecho (Adulta)</option>
                             </select>
                         </div>
 
@@ -354,6 +358,16 @@
                             </select>
                         </div>
 
+                        <!-- Talla / Frame Score -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Talla / Frame Score</label>
+                            <select id="animal-talla" class="w-full rounded-xl border border-slate-300 bg-slate-50/50 px-3.5 py-2.5 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-forest-600">
+                                <option value="chica">Talla Chica (Frame 1-4)</option>
+                                <option value="media" selected>Talla Media (Frame 5-6)</option>
+                                <option value="grande">Talla Grande (Frame 7-9)</option>
+                            </select>
+                        </div>
+
                         <!-- Peso Vivo -->
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1.5">Peso Vivo Promedio (kg)</label>
@@ -363,13 +377,16 @@
                         <!-- Edad -->
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 mb-1.5">Edad Promedio (meses)</label>
-                            <input type="number" id="animal-edad" value="10" min="3" max="120" step="1" class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-forest-600">
+                            <input type="number" id="animal-edad" value="10" min="3" max="140" step="1" class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-forest-600">
                         </div>
 
                         <!-- Meta Productiva: GDP (Engorda) -->
                         <div id="container-meta-gdp">
-                            <label class="block text-xs font-semibold text-slate-700 mb-1.5">Meta: Ganancia Diaria (kg/día)</label>
-                            <input type="number" id="animal-gdp" value="1.5" min="0.4" max="2.5" step="0.1" class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-forest-600">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label class="block text-xs font-semibold text-slate-700">Meta: Ganancia Diaria (kg/día)</label>
+                                <span id="animal-gdp-range-badge" class="text-[10px] font-semibold text-forest-700 bg-forest-50 px-2 py-0.5 rounded-md border border-forest-100">Rango: 1.15 - 1.55</span>
+                            </div>
+                            <input type="number" id="animal-gdp" value="1.4" min="0.2" max="2.5" step="0.05" class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-forest-600">
                         </div>
 
                         <!-- Meta Productiva: Leche (Lechero) -->
@@ -405,10 +422,16 @@
                                 <i data-lucide="activity" class="w-5 h-5 text-forest-700"></i>
                                 <h3 class="font-semibold text-slate-900 text-base">Requerimientos Nutricionales</h3>
                             </div>
-                            <button id="btn-recalc-req" class="text-xs font-medium text-forest-700 hover:text-forest-900 flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-forest-50 transition-colors" title="Recalcular automáticamente">
-                                <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
-                                Auto
-                            </button>
+                            <div class="flex items-center gap-1.5">
+                                <button id="btn-open-reglas-from-form" class="text-xs font-medium text-amber-800 bg-amber-50 hover:bg-amber-100 border border-amber-200 flex items-center gap-1 px-2.5 py-1 rounded-lg transition-colors" title="Consultar rangos y reglas para este perfil">
+                                    <i data-lucide="book-open-check" class="w-3.5 h-3.5"></i>
+                                    Reglas
+                                </button>
+                                <button id="btn-recalc-req" class="text-xs font-medium text-forest-700 hover:text-forest-900 flex items-center gap-1 px-2 py-1 rounded-lg hover:bg-forest-50 transition-colors" title="Recalcular automáticamente">
+                                    <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                                    Auto
+                                </button>
+                            </div>
                         </div>
 
                         <div class="space-y-3.5">
@@ -417,6 +440,7 @@
                                 <div>
                                     <span class="block text-xs font-semibold text-forest-900">Consumo de Materia Seca (CMS)</span>
                                     <span id="req-cms-pct" class="text-xs text-forest-700">2.65% del Peso Vivo</span>
+                                    <span id="req-cms-range" class="block text-[10px] text-forest-700/80 font-medium mt-0.5">Rango sugerido: 7.5 - 9.2 kg/d</span>
                                 </div>
                                 <div class="flex items-center gap-1.5">
                                     <input type="number" id="req-cms" step="0.1" min="2" max="35" class="w-20 text-right font-bold text-lg text-forest-900 bg-white border border-forest-200 rounded-lg px-2 py-1 focus:outline-none focus:ring-2 focus:ring-forest-600">
@@ -428,7 +452,7 @@
                             <div class="flex items-center justify-between p-3 rounded-xl border border-slate-200/80 bg-white">
                                 <div>
                                     <span class="block text-xs font-semibold text-slate-700">Proteína Cruda Mínima (% PC)</span>
-                                    <span class="text-[11px] text-slate-500">En Base Seca</span>
+                                    <span id="req-pc-range" class="text-[11px] text-slate-500">En Base Seca • Rango: 13.0% - 14.8%</span>
                                 </div>
                                 <div class="flex items-center gap-1.5">
                                     <input type="number" id="req-pc" step="0.1" min="5" max="25" class="w-20 text-right font-bold text-slate-900 bg-slate-50 border border-slate-300 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-forest-600">
@@ -440,7 +464,7 @@
                             <div class="flex items-center justify-between p-3 rounded-xl border border-slate-200/80 bg-white">
                                 <div>
                                     <span id="req-en-label" class="block text-xs font-semibold text-slate-700">Energía de Ganancia (ENg)</span>
-                                    <span class="text-[11px] text-slate-500">Mcal / kg de Materia Seca</span>
+                                    <span id="req-en-range" class="text-[11px] text-slate-500">Mcal/kg MS • Rango: 1.05 - 1.24</span>
                                 </div>
                                 <div class="flex items-center gap-1.5">
                                     <input type="number" id="req-en" step="0.02" min="0.4" max="2.2" class="w-20 text-right font-bold text-slate-900 bg-slate-50 border border-slate-300 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-forest-600">
@@ -452,13 +476,19 @@
                             <div class="flex items-center justify-between p-3 rounded-xl border border-slate-200/80 bg-white">
                                 <div>
                                     <span class="block text-xs font-semibold text-slate-700">FDN de Forraje Mínima (% FDNf)</span>
-                                    <span class="text-[11px] text-slate-500">Aportada solo por insumos tipo Forraje</span>
+                                    <span id="req-fdn-range" class="text-[11px] text-slate-500">Solo Forrajes • Rango: 11.5% - 16.0%</span>
                                 </div>
                                 <div class="flex items-center gap-1.5">
                                     <input type="number" id="req-fdn" step="0.5" min="6" max="60" class="w-20 text-right font-bold text-slate-900 bg-slate-50 border border-slate-300 rounded-lg px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-forest-600">
                                     <span class="text-xs font-medium text-slate-500">%</span>
                                 </div>
                             </div>
+                        </div>
+
+                        <!-- Alerta de ajuste fuera de rango -->
+                        <div id="req-out-of-range-alert" class="hidden mt-3 p-2.5 rounded-xl bg-red-50 border border-red-200 text-[11px] text-red-800 font-medium flex items-start gap-2">
+                            <i data-lucide="alert-circle" class="w-4 h-4 text-red-600 shrink-0 mt-0.5"></i>
+                            <span id="req-out-of-range-text"></span>
                         </div>
                     </div>
 
@@ -807,6 +837,290 @@
                             <!-- Populated by JS -->
                         </tbody>
                     </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- =================================================================== -->
+        <!-- MÓDULO NUEVO: REGLAS DE ENGORDE (MANUAL DE BOVINOS UAM + NRC/NASEM) -->
+        <!-- =================================================================== -->
+        <section id="tab-reglas" class="tab-content hidden space-y-6">
+            <!-- Header -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-slate-900 tracking-tight">Reglas de Engorde y Requerimientos</h2>
+                    <p class="text-sm text-slate-500 mt-1">Motor técnico basado en <em>Alimentación de Ganado Bovino con Dietas Altas en Grano</em> (Mendoza & Ricalde, UAM) y estándares NRC/NASEM.</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 no-print">
+                    <button id="btn-reglas-send-formulator" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-forest-900 hover:bg-forest-800 text-white text-xs font-bold shadow-sm transition-colors">
+                        <i data-lucide="send" class="w-4 h-4"></i>
+                        <span>Aplicar este Perfil al Formulador</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Accesos Rápidos de Comparación (Ejemplos Clave) -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
+                    <span class="text-xs font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+                        <i data-lucide="zap" class="w-4 h-4 text-amber-500"></i>
+                        Perfiles de Ejemplo Rápido:
+                    </span>
+                    <div class="flex flex-wrap gap-2">
+                        <button type="button" data-preset="vaca_rec_350" class="reglas-preset-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-forest-50 hover:text-forest-900 border border-slate-200 transition-colors">
+                            Recepción • Vaca Vieja • F1 • 80m • 350 kg
+                        </button>
+                        <button type="button" data-preset="vaca_fin_450" class="reglas-preset-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-forest-50 hover:text-forest-900 border border-slate-200 transition-colors">
+                            Finalización • Vaca Vieja • F1 • 80m • 450 kg
+                        </button>
+                        <button type="button" data-preset="novilla_fin_450" class="reglas-preset-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-forest-50 hover:text-forest-900 border border-slate-200 transition-colors">
+                            Finalización • Novilla • F1 • 16m • 450 kg
+                        </button>
+                        <button type="button" data-preset="toro_fin_480" class="reglas-preset-btn px-3 py-1.5 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-forest-50 hover:text-forest-900 border border-slate-200 transition-colors">
+                            Finalización • Toro Entero • F1 • 18m • 480 kg
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 1. SIMULADOR DE COMBINACIONES Y TABLA DE RANGOS MÍN / SUGERIDO / MÁX -->
+            <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+                <!-- Controles de Combinación (5 cols) -->
+                <div class="xl:col-span-5 bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 space-y-4">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <div class="flex items-center gap-2">
+                            <span class="w-7 h-7 rounded-lg bg-forest-900 text-white text-xs font-bold flex items-center justify-center">1</span>
+                            <h3 class="font-bold text-slate-900 text-sm">Configurar Combinación Animal</h3>
+                        </div>
+                        <button type="button" id="btn-reglas-pin-compare" class="text-xs font-semibold text-blue-700 bg-blue-50 hover:bg-blue-100 border border-blue-200 px-2.5 py-1 rounded-lg transition-colors flex items-center gap-1" title="Guardar este perfil como Perfil A para compararlo contra otro">
+                            <i data-lucide="columns-2" class="w-3.5 h-3.5"></i>
+                            Fijar p/ Comparar
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div class="sm:col-span-2">
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Etapa Productiva</label>
+                            <select id="reglas-proposito" class="w-full rounded-xl border border-slate-300 bg-slate-50/50 px-3 py-2 text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-forest-600">
+                                <option value="recepcion">Engorda - Recepción (Adaptación)</option>
+                                <option value="desarrollo">Engorda - Desarrollo (Crecimiento)</option>
+                                <option value="finalizacion" selected>Engorda - Finalización (Acabado)</option>
+                                <option value="lechero">Lechero (Producción)</option>
+                                <option value="mantenimiento">Mantenimiento (Cría / Vientres)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Clase / Sexo</label>
+                            <select id="reglas-sexo" class="w-full rounded-xl border border-slate-300 bg-slate-50/50 px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-forest-600">
+                                <option value="macho_entero">Macho Entero (Toro)</option>
+                                <option value="novillo">Novillo (Castrado)</option>
+                                <option value="novilla">Novilla / Vaquilla (Crecimiento)</option>
+                                <option value="vaca_vieja" selected>Vaca Vieja / Desecho (Adulta)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Raza / Genotipo</label>
+                            <select id="reglas-raza" class="w-full rounded-xl border border-slate-300 bg-slate-50/50 px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-forest-600">
+                                <option value="cruza" selected>Cruza (F1 / Comercial)</option>
+                                <option value="europeo">Europeo (Angus, Charolais, Hereford)</option>
+                                <option value="cebu">Cebú (Brahman, Nelore)</option>
+                                <option value="lechero">Lechero (Holstein, Suizo)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Talla / Frame Score</label>
+                            <select id="reglas-talla" class="w-full rounded-xl border border-slate-300 bg-slate-50/50 px-3 py-2 text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-forest-600">
+                                <option value="chica">Talla Chica (Frame 1-4)</option>
+                                <option value="media" selected>Talla Media (Frame 5-6)</option>
+                                <option value="grande">Talla Grande (Frame 7-9)</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Peso Vivo (kg)</label>
+                            <input type="number" id="reglas-peso" value="450" min="100" max="1100" step="5" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-forest-600">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Edad (meses)</label>
+                            <input type="number" id="reglas-edad" value="80" min="3" max="140" step="1" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm font-bold text-slate-900 focus:outline-none focus:ring-2 focus:ring-forest-600">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 mb-1">Temperatura (°C)</label>
+                            <input type="number" id="reglas-temp" value="28" min="-5" max="50" step="1" class="w-full rounded-xl border border-slate-300 px-3 py-2 text-sm font-medium text-slate-900 focus:outline-none focus:ring-2 focus:ring-forest-600">
+                        </div>
+
+                        <div class="sm:col-span-2">
+                            <label class="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-200 bg-slate-50 cursor-pointer">
+                                <input type="checkbox" id="reglas-implante" class="w-4 h-4 rounded text-forest-700 focus:ring-forest-600">
+                                <span class="text-xs font-semibold text-slate-700">Con Implante Anabólico (+4% CMS, +0.6% PC, +10% GDP)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Diagnóstico fisiológico -->
+                    <div id="reglas-diagnostico-box" class="p-3.5 rounded-xl bg-amber-50 border border-amber-200 text-xs text-amber-950 leading-relaxed space-y-1">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Tabla de Rangos Calculados (7 cols) -->
+                <div class="xl:col-span-7 bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden flex flex-col justify-between">
+                    <div>
+                        <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <div>
+                                <h3 class="font-bold text-slate-900 text-base">Rangos Nutricionales y Productivos (Mínimo — Óptimo — Máximo)</h3>
+                                <p id="reglas-profile-summary" class="text-xs text-slate-500 mt-0.5">Finalización • Vaca Vieja • Cruza F1 • 80 meses • 450 kg</p>
+                            </div>
+                            <span id="reglas-fase-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-forest-100 text-forest-900 self-start sm:self-auto">
+                                Madurez: 100%
+                            </span>
+                        </div>
+
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                                        <th class="py-3 px-4">Parámetro</th>
+                                        <th class="py-3 px-4 text-right">Mínimo</th>
+                                        <th class="py-3 px-4 text-right bg-forest-50/70 text-forest-900">Óptimo Sugerido</th>
+                                        <th class="py-3 px-4 text-right">Máximo</th>
+                                        <th class="py-3 px-4 hidden sm:table-cell">Criterio Técnico</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="reglas-ranges-tbody" class="divide-y divide-slate-100 text-sm">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Mini barra de métricas NRC calculadas -->
+                    <div id="reglas-nrc-footer" class="p-4 bg-slate-50 border-t border-slate-200 grid grid-cols-2 sm:grid-cols-4 gap-3 text-center text-xs">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- COMPARADOR LADO A LADO (PERFIL A FIJADO VS PERFIL ACTUAL) -->
+            <div id="reglas-compare-section" class="hidden bg-white rounded-2xl shadow-sm border-2 border-blue-200 overflow-hidden">
+                <div class="px-5 py-3.5 bg-blue-50 border-b border-blue-200 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="columns-2" class="w-4 h-4 text-blue-700"></i>
+                        <h3 class="font-bold text-blue-950 text-sm">Comparativa Directa: Perfil A (Fijado) vs. Perfil B (Actual)</h3>
+                    </div>
+                    <button type="button" id="btn-reglas-clear-compare" class="text-xs font-semibold text-blue-700 hover:text-blue-950">Cerrar comparador</button>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-semibold uppercase text-slate-500">
+                                <th class="py-2.5 px-4">Indicador</th>
+                                <th id="cmp-head-a" class="py-2.5 px-4 text-right text-blue-900">Perfil A</th>
+                                <th id="cmp-head-b" class="py-2.5 px-4 text-right text-forest-900">Perfil B (Actual)</th>
+                                <th class="py-2.5 px-4 text-right">Diferencia (B - A)</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reglas-compare-tbody" class="divide-y divide-slate-100">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 2. LÍMITES DE ETAPAS DE ENGORDE POR PESO, RAZA Y TALLA (¿CUÁNDO CAMBIAR LA DIETA?) -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 sm:p-6 space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-7 h-7 rounded-lg bg-forest-900 text-white text-xs font-bold flex items-center justify-center">2</span>
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-base">Límites de Peso por Etapa y Momento de Cambio de Dieta</h3>
+                            <p id="reglas-stages-subtitle" class="text-xs text-slate-500">Ajustado automáticamente a la Clase, Raza y Talla seleccionadas.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="reglas-stages-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                    <!-- Populated dynamically -->
+                </div>
+
+                <!-- Regla práctica de ajuste por peso en recta final (ej. 450 -> 520 kg) -->
+                <div id="reglas-transition-advice" class="p-4 rounded-xl bg-forest-50 border border-forest-200 text-xs sm:text-sm text-forest-950 leading-relaxed">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- 3. TABLA MAESTRA DE REFERENCIA RÁPIDA (TODAS LAS CLASES Y ETAPAS) -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+                <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-7 h-7 rounded-lg bg-forest-900 text-white text-xs font-bold flex items-center justify-center">3</span>
+                        <div>
+                            <h3 class="font-bold text-slate-900 text-base">Matriz Maestra de Reglas de Engorde (Referencia Completa)</h3>
+                            <p class="text-xs text-slate-500">Rangos Mínimo–Máximo para Cruza F1 / Talla Media (haz clic en cualquier fila para cargarla arriba).</p>
+                        </div>
+                    </div>
+                    <select id="reglas-matrix-filter" class="rounded-xl border border-slate-300 px-3 py-1.5 text-xs font-semibold text-slate-700 bg-white">
+                        <option value="all">Todas las etapas</option>
+                        <option value="recepcion">Solo Recepción</option>
+                        <option value="desarrollo">Solo Desarrollo</option>
+                        <option value="finalizacion">Solo Finalización</option>
+                    </select>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-slate-200 text-[11px] font-semibold uppercase tracking-wider text-slate-500">
+                                <th class="py-3 px-4">Etapa</th>
+                                <th class="py-3 px-4">Clase / Edad / Peso Ref.</th>
+                                <th class="py-3 px-4 text-center">GDP (kg/d)</th>
+                                <th class="py-3 px-4 text-center">CMS (% PV)</th>
+                                <th class="py-3 px-4 text-center">% PC (BS)</th>
+                                <th class="py-3 px-4 text-center">ENg (Mcal/kg)</th>
+                                <th class="py-3 px-4 text-center">% FDN Forraje</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reglas-matrix-tbody" class="divide-y divide-slate-100">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 4. CLAVES TÉCNICAS DEL MANUAL DE BOVINOS (UAM) -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 space-y-2">
+                    <div class="flex items-center gap-2 text-forest-900 font-bold text-sm">
+                        <i data-lucide="shield-alert" class="w-4 h-4 text-amber-600"></i>
+                        <span>Forraje y Prevención de Acidosis (Cap. VI y VIII)</span>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        En finalización de ganado joven la ventana óptima es <strong>6% a 9% de FDN de forraje</strong> (máximo consumo de energía en 8% FDNf, Fig. 8.1). En <strong>vacas viejas de desecho</strong> se recomienda <strong>9.5% a 13.5% FDNf</strong> para prevenir acidosis y laminitis. Picar pajas a 2.5 cm y alfalfa a 5 cm.
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 space-y-2">
+                    <div class="flex items-center gap-2 text-forest-900 font-bold text-sm">
+                        <i data-lucide="heart-pulse" class="w-4 h-4 text-emerald-600"></i>
+                        <span>Protocolo de Recepción (Cap. VII)</span>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Primeros 2–3 días solo forraje de buena calidad y agua limpia. Asegurar <strong>1.2%–1.4% de Potasio (K)</strong> si la merma de viaje superó el 7%. En recepción el consumo baja a 1.5–2.2% PV; evitar ionóforos a dosis plena los primeros 14 días y no superar 50–55% de concentrado.
+                    </p>
+                </div>
+
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200/80 space-y-2">
+                    <div class="flex items-center gap-2 text-forest-900 font-bold text-sm">
+                        <i data-lucide="flame" class="w-4 h-4 text-blue-600"></i>
+                        <span>Cambios de Dieta y Acabado (Cap. XII–XIV)</span>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Realizar transiciones de dieta <strong>por la tarde</strong> (menor tamaño de comida, menor riesgo de acidosis). En los últimos 60–70 kg (ej. Toro 450→520 kg) mantener la energía estable y ajustar <strong>-0.4% a -0.8% PC</strong> si no se usa $\beta$-agonista; si se usa zilpaterol (últimos 20–30 días), sostener PC en 13.0–13.5%.
+                    </p>
                 </div>
             </div>
         </section>
@@ -1268,8 +1582,9 @@
         let chartCost = null;
         let confirmCallback = null;
         let isApplyingRemoteState = false;
-
-        // Estado de Pastoreo Rotativo (46 Cuadros)
+        let lastComputedRules = null;
+        let pinnedCompareProfile = null;
+        let pinnedCompareRules = null;
         let pastoreoState = {
             metaDias: 45,
             fechaRef: new Date().toISOString().split('T')[0],
@@ -1278,19 +1593,728 @@
         };
 
         // -------------------------------------------------------------------
-        // 2. INICIALIZACIÓN DE DATOS LOCALES Y PASTOREO
+        // 3. MOTOR CIENTÍFICO DE REGLAS DE ENGORDE (NRC/NASEM + MANUAL UAM)
         // -------------------------------------------------------------------
+        function getMatureWeightRef(sexo, raza, talla) {
+            // Peso maduro de referencia (kg) según clase sexual, genotipo y Frame Score (Cuadro 12.2 Manual UAM & NASEM 2016)
+            const baseByRaza = {
+                cruza: 520,
+                europeo: 560,
+                cebu: 490,
+                lechero: 580
+            };
+            const tallaMult = {
+                chica: 0.90,
+                media: 1.00,
+                grande: 1.12
+            };
+            const sexoMult = {
+                macho_entero: 1.15,
+                novillo: 1.00,
+                novilla: 0.86,
+                vaca_vieja: 0.92
+            };
+            const base = baseByRaza[raza] || 520;
+            return Math.round(base * (tallaMult[talla] || 1.0) * (sexoMult[sexo] || 1.0));
+        }
+
+        function computeEngordaRules(profile) {
+            const proposito = profile.proposito || 'desarrollo';
+            const sexo = profile.sexo || 'macho_entero';
+            const raza = profile.raza || 'cruza';
+            const talla = profile.talla || 'media';
+            const peso = Math.max(80, parseFloat(profile.peso) || 320);
+            const edad = Math.max(3, parseFloat(profile.edad) || 12);
+            const leche = Math.max(5, parseFloat(profile.leche) || 22);
+            const temp = isNaN(parseFloat(profile.temp)) ? 28 : parseFloat(profile.temp);
+            const implante = Boolean(profile.implante);
+
+            const srw = getMatureWeightRef(sexo, raza, talla);
+            const isVacaVieja = sexo === 'vaca_vieja';
+            const isNovilla = sexo === 'novilla';
+            const isToro = sexo === 'macho_entero';
+            const isNovillo = sexo === 'novillo';
+
+            // Grado de madurez fisiológica (0.35 a 1.05) combinando peso relativo y edad
+            const matByWeight = Math.min(1.05, Math.max(0.35, peso / srw));
+            const matByAge = isVacaVieja ? 1.0 : Math.min(1.0, edad / 36);
+            const maturity = isVacaVieja ? 1.0 : (matByWeight * 0.75 + matByAge * 0.25);
+
+            // Peso metabólico y ENm base (NRC/NASEM: 0.077 * PV^0.75)
+            const pv075 = Math.pow(peso, 0.75);
+            let enmFactorRaza = 1.0;
+            if (raza === 'cebu') enmFactorRaza = 0.90;
+            else if (raza === 'lechero') enmFactorRaza = 1.15;
+            else if (raza === 'europeo') enmFactorRaza = 1.03;
+
+            let enmFactorSexo = isToro ? 1.15 : (isVacaVieja ? 0.96 : 1.00);
+            let enmFactorClima = 1.0;
+            if (temp < 10) enmFactorClima = 1 + (10 - temp) * 0.012;
+            else if (temp > 32) enmFactorClima = 1 + (temp - 32) * 0.008;
+
+            const enmReqMcalDia = 0.077 * pv075 * enmFactorRaza * enmFactorSexo * enmFactorClima;
+
+            // Parámetros base por etapa (referencia: Novillo Cruza F1 Talla Media)
+            let gdpMin = 1.10, gdpOpt = 1.35, gdpMax = 1.60;
+            let cmsPctMin = 2.40, cmsPctOpt = 2.65, cmsPctMax = 2.90;
+            let pcMin = 13.0, pcOpt = 13.8, pcMax = 14.8;
+            let enMin = 1.02, enOpt = 1.14, enMax = 1.24;
+            let enmDietaMin = 1.62, enmDietaOpt = 1.76, enmDietaMax = 1.88;
+            let fdnMin = 11.5, fdnOpt = 14.0, fdnMax = 16.5;
+            let forrajePctText = '20% - 30%';
+            let nota = '';
+
+            if (proposito === 'recepcion') {
+                gdpMin = 0.65; gdpOpt = 0.85; gdpMax = 1.15;
+                cmsPctMin = 2.00; cmsPctOpt = 2.35; cmsPctMax = 2.65;
+                pcMin = 13.5; pcOpt = 14.5; pcMax = 15.8;
+                enMin = 0.76; enOpt = 0.86; enMax = 0.98;
+                enmDietaMin = 1.38; enmDietaOpt = 1.50; enmDietaMax = 1.64;
+                fdnMin = 18.0; fdnOpt = 22.0; fdnMax = 26.0;
+                forrajePctText = '40% - 55%';
+                nota = 'Recepción (primeros 14-21 días): prioridad sanitaria y adaptación ruminal. Consumo inicial bajo (1.5-2.3% PV). Aportar 1.2-1.4% de Potasio (K) y vitamina E/Se.';
+            } else if (proposito === 'desarrollo') {
+                gdpMin = 1.05; gdpOpt = 1.35; gdpMax = 1.60;
+                cmsPctMin = 2.40; cmsPctOpt = 2.65; cmsPctMax = 2.95;
+                pcMin = 13.0; pcOpt = 13.8; pcMax = 14.8;
+                enMin = 1.02; enOpt = 1.14; enMax = 1.24;
+                enmDietaMin = 1.64; enmDietaOpt = 1.78; enmDietaMax = 1.90;
+                fdnMin = 11.5; fdnOpt = 14.0; fdnMax = 16.5;
+                forrajePctText = '20% - 30%';
+                nota = 'Desarrollo (crecimiento muscular): equilibrio entre energía y proteína para maximizar deposición de tejido magro sin engrasamiento prematuro.';
+            } else if (proposito === 'finalizacion') {
+                gdpMin = 1.30; gdpOpt = 1.55; gdpMax = 1.85;
+                cmsPctMin = 2.30; cmsPctOpt = 2.55; cmsPctMax = 2.80;
+                pcMin = 12.0; pcOpt = 12.8; pcMax = 13.8;
+                enMin = 1.18; enOpt = 1.28; enMax = 1.38;
+                enmDietaMin = 1.85; enmDietaOpt = 1.98; enmDietaMax = 2.12;
+                fdnMin = 6.5; fdnOpt = 8.5; fdnMax = 10.5;
+                forrajePctText = '10% - 16%';
+                nota = 'Finalización (acabado): máxima densidad energética (ENg 1.20-1.38 Mcal/kg). Ventana óptima de FDN de forraje de 6-9% (Manual UAM Fig. 8.1).';
+            } else if (proposito === 'lechero') {
+                gdpMin = 0.0; gdpOpt = 0.20; gdpMax = 0.50;
+                const baseCms = 2.20 + (leche * 0.045);
+                cmsPctMin = baseCms - 0.25; cmsPctOpt = baseCms; cmsPctMax = baseCms + 0.30;
+                pcMin = 14.8 + (leche - 20) * 0.10; pcOpt = 15.8 + (leche - 20) * 0.12; pcMax = 17.0 + (leche - 20) * 0.12;
+                enMin = 1.48 + (leche - 20) * 0.01; enOpt = 1.58 + (leche - 20) * 0.012; enMax = 1.70 + (leche - 20) * 0.012;
+                enmDietaMin = enMin; enmDietaOpt = enOpt; enmDietaMax = enMax;
+                fdnMin = 18.0; fdnOpt = 21.0; fdnMax = 25.0;
+                forrajePctText = '40% - 55%';
+                nota = 'Ganado lechero: requiere alto consumo de MS y ≥20% FDN de forraje efectivo para mantener grasa láctea y salud ruminal.';
+            } else {
+                gdpMin = 0.0; gdpOpt = 0.25; gdpMax = 0.55;
+                cmsPctMin = 1.80; cmsPctOpt = 2.05; cmsPctMax = 2.30;
+                pcMin = 8.5; pcOpt = 9.8; pcMax = 11.2;
+                enMin = 0.65; enOpt = 0.78; enMax = 0.92;
+                enmDietaMin = 1.20; enmDietaOpt = 1.35; enmDietaMax = 1.50;
+                fdnMin = 24.0; fdnOpt = 28.0; fdnMax = 35.0;
+                forrajePctText = '60% - 80%';
+                nota = 'Mantenimiento / Vientres: dieta económica basada en forrajes para sostener condición corporal.';
+            }
+
+            // ---------------------------------------------------------------
+            // AJUSTES FISIOLÓGICOS POR CLASE / SEXO (CORRECCIÓN CENTRAL)
+            // ---------------------------------------------------------------
+            if (proposito !== 'lechero' && proposito !== 'mantenimiento') {
+                if (isToro) {
+                    // Toro entero: mayor deposición de músculo, mayor GDP, mayor %PC, menor engrasamiento
+                    gdpMin *= 1.12; gdpOpt *= 1.12; gdpMax *= 1.14;
+                    cmsPctMin += 0.05; cmsPctOpt += 0.06; cmsPctMax += 0.08;
+                    pcMin += 0.6; pcOpt += 0.7; pcMax += 0.8;
+                    enMin += 0.02; enOpt += 0.02; enMax += 0.03;
+                    nota = `Toro Entero (${peso} kg): mayor tasa de síntesis proteica y GDP (+12% vs novillo), requiere +0.7% PC adicional. ` + nota;
+                } else if (isNovilla) {
+                    // Novilla / Vaquilla en crecimiento: menor GDP y CMS que novillo, engrasa antes, requiere PC intermedia-alta
+                    gdpMin *= 0.88; gdpOpt *= 0.88; gdpMax *= 0.90;
+                    cmsPctMin -= 0.12; cmsPctOpt -= 0.12; cmsPctMax -= 0.10;
+                    pcMin -= 0.2; pcOpt -= 0.2; pcMax -= 0.2;
+                    fdnMin += 0.5; fdnOpt += 0.5; fdnMax += 0.5;
+                    nota = `Novilla/Vaquilla en crecimiento (${edad} meses, ${peso} kg): aún deposita tejido magro y alcanza acabado a menor peso que el macho. Mantiene requerimiento proteico moderado-alto (${pcOpt.toFixed(1)}% PC). ` + nota;
+                } else if (isVacaVieja) {
+                    // Vaca Vieja / Desecho: animal adulto maduro (sin crecimiento óseo), deposita grasa + recuperación muscular compensatoria
+                    // Menor %PC, mayor capacidad de CMS (%PV), mayor necesidad de FDNf por prevención de acidosis
+                    if (proposito === 'recepcion') {
+                        gdpMin = 0.65; gdpOpt = 0.85; gdpMax = 1.15;
+                        cmsPctMin = 2.15; cmsPctOpt = 2.40; cmsPctMax = 2.70;
+                        pcMin = 10.8; pcOpt = 11.6; pcMax = 12.6;
+                        enMin = 0.78; enOpt = 0.88; enMax = 0.98;
+                        fdnMin = 20.0; fdnOpt = 23.0; fdnMax = 27.0;
+                    } else if (proposito === 'desarrollo') {
+                        gdpMin = 0.90; gdpOpt = 1.15; gdpMax = 1.40;
+                        cmsPctMin = 2.45; cmsPctOpt = 2.75; cmsPctMax = 3.05;
+                        pcMin = 10.4; pcOpt = 11.2; pcMax = 12.2;
+                        enMin = 0.98; enOpt = 1.08; enMax = 1.18;
+                        fdnMin = 13.5; fdnOpt = 16.0; fdnMax = 19.0;
+                    } else {
+                        // Finalización de vaca de desecho (engorda corta de 50-75 días)
+                        gdpMin = 1.00; gdpOpt = 1.25; gdpMax = 1.55;
+                        cmsPctMin = 2.45; cmsPctOpt = 2.70; cmsPctMax = 3.00;
+                        pcMin = 10.0; pcOpt = 10.8; pcMax = 11.6;
+                        enMin = 1.10; enOpt = 1.20; enMax = 1.30;
+                        fdnMin = 9.5; fdnOpt = 11.5; fdnMax = 14.0;
+                        forrajePctText = '15% - 22%';
+                    }
+                    nota = `Vaca Vieja / Desecho (${edad} meses, ${peso} kg): madurez fisiológica completa (no hay crecimiento óseo). Requiere ~1.8-2.0% MENOS Proteína Cruda que una novilla joven del mismo peso, tiene mayor capacidad ruminal de consumo (% PV) y requiere más FDN de forraje (${fdnMin.toFixed(1)}-${fdnMax.toFixed(1)}%) para prevenir acidosis. Ciclo óptimo corto: 50 a 75 días.`;
+                }
+            }
+
+            // Alerta si seleccionó Novilla pero puso edad de vaca adulta (>= 42 meses)
+            if (isNovilla && edad >= 42) {
+                nota = `⚠️ Alerta de edad: Con ${edad} meses el animal ya es fisiológicamente una Vaca Adulta/Vieja (no una novilla en crecimiento). Se sugiere cambiar Clase a "Vaca Vieja / Desecho". ` + nota;
+            }
+
+            // ---------------------------------------------------------------
+            // AJUSTES POR PESO VIVO / MADUREZ (CURVA DE CRECIMIENTO NRC)
+            // ---------------------------------------------------------------
+            if (proposito !== 'lechero' && proposito !== 'mantenimiento') {
+                if (!isVacaVieja) {
+                    // Animales jóvenes ligeros (<250 kg) requieren más PC% (hasta +1.2%) y algo menos ENg extrema
+                    // Animales pesados cerca de venta (>85% de SRW) requieren menos PC% (-0.4 a -0.8%) y menor CMS en %PV
+                    const pcMatAdj = (0.68 - maturity) * 2.8; // positivo en ligeros, negativo en pesados
+                    pcMin += pcMatAdj;
+                    pcOpt += pcMatAdj;
+                    pcMax += pcMatAdj;
+
+                    if (maturity > 0.85 && proposito === 'finalizacion') {
+                        // Recta final / Acabado (ej. Toro 450 -> 520 kg)
+                        cmsPctMin -= 0.08; cmsPctOpt -= 0.08; cmsPctMax -= 0.08;
+                        enMin += 0.02; enOpt += 0.03; enMax += 0.03;
+                    } else if (peso < 220) {
+                        // Becerros ligeros (Cuadro 7.9 Manual UAM)
+                        gdpMin *= 0.85; gdpOpt *= 0.85; gdpMax *= 0.88;
+                    }
+                } else {
+                    // En vaca vieja, al pasar de 450-500 kg la eficiencia y GDP caen por engrasamiento excesivo
+                    if (peso >= 480 && proposito === 'finalizacion') {
+                        gdpMin *= 0.90; gdpOpt *= 0.90; gdpMax *= 0.92;
+                        cmsPctMin -= 0.10; cmsPctOpt -= 0.10; cmsPctMax -= 0.10;
+                    }
+                }
+            }
+
+            // ---------------------------------------------------------------
+            // AJUSTES POR RAZA Y TALLA (FRAME SCORE)
+            // ---------------------------------------------------------------
+            if (raza === 'cebu') {
+                cmsPctMin -= 0.10; cmsPctOpt -= 0.10; cmsPctMax -= 0.10;
+                gdpMin *= 0.94; gdpOpt *= 0.95; gdpMax *= 0.96;
+            } else if (raza === 'europeo') {
+                cmsPctMin += 0.06; cmsPctOpt += 0.06; cmsPctMax += 0.08;
+                gdpMin *= 1.04; gdpOpt *= 1.05; gdpMax *= 1.06;
+                pcMin += 0.2; pcOpt += 0.2; pcMax += 0.3;
+            } else if (raza === 'lechero' && proposito !== 'lechero') {
+                cmsPctMin += 0.12; cmsPctOpt += 0.15; cmsPctMax += 0.18;
+                pcMin += 0.3; pcOpt += 0.3; pcMax += 0.4;
+            }
+
+            if (talla === 'grande') {
+                gdpMin *= 1.05; gdpOpt *= 1.06; gdpMax *= 1.07;
+                pcMin += 0.2; pcOpt += 0.3; pcMax += 0.3;
+            } else if (talla === 'chica') {
+                gdpMin *= 0.92; gdpOpt *= 0.93; gdpMax *= 0.94;
+                pcMin -= 0.2; pcOpt -= 0.2; pcMax -= 0.2;
+            }
+
+            // ---------------------------------------------------------------
+            // AJUSTES POR TEMPERATURA E IMPLANTE ANABÓLICO (CAP. XIII)
+            // ---------------------------------------------------------------
+            if (temp > 32) {
+                const factorCalor = Math.min(0.16, (temp - 32) * 0.012);
+                cmsPctMin *= (1 - factorCalor);
+                cmsPctOpt *= (1 - factorCalor);
+                cmsPctMax *= (1 - factorCalor);
+                gdpMin *= (1 - factorCalor * 0.8);
+                gdpOpt *= (1 - factorCalor * 0.8);
+                gdpMax *= (1 - factorCalor * 0.8);
+                pcMin += 0.3; pcOpt += 0.4; pcMax += 0.4;
+                nota += ` Estrés calórico (${temp}°C): consumo reducido -${(factorCalor * 100).toFixed(1)}% y concentración de PC ajustada.`;
+            } else if (temp < 10) {
+                const factorFrio = Math.min(0.10, (10 - temp) * 0.008);
+                cmsPctMin *= (1 + factorFrio);
+                cmsPctOpt *= (1 + factorFrio);
+                cmsPctMax *= (1 + factorFrio);
+            }
+
+            if (implante && proposito !== 'lechero' && proposito !== 'mantenimiento') {
+                cmsPctMin *= 1.04; cmsPctOpt *= 1.04; cmsPctMax *= 1.05;
+                gdpMin *= 1.09; gdpOpt *= 1.10; gdpMax *= 1.12;
+                pcMin += 0.5; pcOpt += 0.6; pcMax += 0.7;
+            }
+
+            // Si el usuario modificó la meta de GDP manualmente en el formulador, ajustar ligeramente ENg y PC dentro de límites lógicos
+            if (profile.customGdp && proposito !== 'lechero' && proposito !== 'mantenimiento') {
+                const diffGdp = Math.max(-0.5, Math.min(0.5, profile.customGdp - gdpOpt));
+                enOpt = Math.max(enMin - 0.06, Math.min(enMax + 0.06, enOpt + diffGdp * 0.20));
+                pcOpt = Math.max(pcMin - 0.5, Math.min(pcMax + 0.8, pcOpt + diffGdp * 1.1));
+            }
+
+            // Limitar valores a rangos biológicos válidos
+            const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+            pcMin = clamp(pcMin, 8.0, 20.0);
+            pcOpt = clamp(pcOpt, pcMin, 21.0);
+            pcMax = clamp(pcMax, pcOpt + 0.4, 22.0);
+
+            enMin = clamp(enMin, 0.60, 1.80);
+            enOpt = clamp(enOpt, enMin, 1.90);
+            enMax = clamp(enMax, enOpt + 0.04, 2.00);
+
+            fdnMin = clamp(fdnMin, 6.0, 35.0);
+            fdnOpt = clamp(fdnOpt, fdnMin, 40.0);
+            fdnMax = clamp(fdnMax, fdnOpt + 1.0, 45.0);
+
+            const cmsKgMin = (peso * cmsPctMin) / 100;
+            const cmsKgOpt = (peso * cmsPctOpt) / 100;
+            const cmsKgMax = (peso * cmsPctMax) / 100;
+
+            const caOpt = gdpOpt > 0.1 ? (cmsKgOpt / gdpOpt) : 0;
+            const caBest = gdpMax > 0.1 ? (cmsKgMin / gdpMax) : 0;
+            const caWorst = gdpMin > 0.1 ? (cmsKgMax / gdpMin) : 0;
+
+            return {
+                srw,
+                maturityPct: Math.round(maturity * 100),
+                enmReqMcalDia,
+                forrajePctText,
+                nota,
+                gdp: { min: gdpMin, opt: gdpOpt, max: gdpMax },
+                cmsPct: { min: cmsPctMin, opt: cmsPctOpt, max: cmsPctMax },
+                cmsKg: { min: cmsKgMin, opt: cmsKgOpt, max: cmsKgMax },
+                pc: { min: pcMin, opt: pcOpt, max: pcMax },
+                en: { min: enMin, opt: enOpt, max: enMax },
+                enmDieta: { min: enmDietaMin, opt: enmDietaOpt, max: enmDietaMax },
+                fdn: { min: fdnMin, opt: fdnOpt, max: fdnMax },
+                ca: { min: caBest, opt: caOpt, max: caWorst }
+            };
+        }
+
+        function getFormulatorProfile() {
+            return {
+                proposito: document.getElementById('animal-proposito').value,
+                sexo: document.getElementById('animal-sexo').value,
+                raza: document.getElementById('animal-raza').value,
+                talla: document.getElementById('animal-talla')?.value || 'media',
+                peso: parseFloat(document.getElementById('animal-peso').value) || 320,
+                edad: parseFloat(document.getElementById('animal-edad').value) || 10,
+                customGdp: parseFloat(document.getElementById('animal-gdp').value) || null,
+                leche: parseFloat(document.getElementById('animal-leche').value) || 22,
+                temp: parseFloat(document.getElementById('animal-temp').value) || 28,
+                implante: document.getElementById('animal-implante').checked
+            };
+        }
+
+        function checkManualRequirementsOutOfRange() {
+            const alertBox = document.getElementById('req-out-of-range-alert');
+            const alertText = document.getElementById('req-out-of-range-text');
+            if (!alertBox || !alertText || !lastComputedRules) return;
+
+            const r = lastComputedRules;
+            const curCms = parseFloat(document.getElementById('req-cms').value) || 0;
+            const curPc = parseFloat(document.getElementById('req-pc').value) || 0;
+            const curEn = parseFloat(document.getElementById('req-en').value) || 0;
+            const curFdn = parseFloat(document.getElementById('req-fdn').value) || 0;
+
+            const warnings = [];
+            if (curCms < r.cmsKg.min - 0.2 || curCms > r.cmsKg.max + 0.2) warnings.push(`CMS (${curCms.toFixed(1)} vs ${r.cmsKg.min.toFixed(1)}-${r.cmsKg.max.toFixed(1)} kg)`);
+            if (curPc < r.pc.min - 0.1 || curPc > r.pc.max + 0.1) warnings.push(`PC (${curPc.toFixed(1)}% vs ${r.pc.min.toFixed(1)}-${r.pc.max.toFixed(1)}%)`);
+            if (curEn < r.en.min - 0.02 || curEn > r.en.max + 0.02) warnings.push(`Energía (${curEn.toFixed(2)} vs ${r.en.min.toFixed(2)}-${r.en.max.toFixed(2)} Mcal)`);
+            if (curFdn < r.fdn.min - 0.5 || curFdn > r.fdn.max + 0.5) warnings.push(`FDNf (${curFdn.toFixed(1)}% vs ${r.fdn.min.toFixed(1)}-${r.fdn.max.toFixed(1)}%)`);
+
+            if (warnings.length > 0) {
+                alertText.textContent = `Ajuste manual fuera del rango recomendado en Reglas de Engorde: ${warnings.join(' • ')}.`;
+                alertBox.classList.remove('hidden');
+            } else {
+                alertBox.classList.add('hidden');
+            }
+        }
+
+        function calculateNutritionalRequirements(syncGdpToSuggested = false) {
+            const profile = getFormulatorProfile();
+            const isLechero = profile.proposito === 'lechero';
+
+            const containerGdp = document.getElementById('container-meta-gdp');
+            const containerLeche = document.getElementById('container-meta-leche');
+            const enLabel = document.getElementById('req-en-label');
+            const kpiEnLabel = document.getElementById('kpi-en-label');
+
+            if (isLechero) {
+                containerGdp.classList.add('hidden');
+                containerLeche.classList.remove('hidden');
+                enLabel.textContent = 'Energía Neta Lactancia (ENl)';
+                kpiEnLabel.textContent = 'ENl Lograda:';
+            } else {
+                containerGdp.classList.remove('hidden');
+                containerLeche.classList.add('hidden');
+                enLabel.textContent = 'Energía de Ganancia (ENg)';
+                kpiEnLabel.textContent = 'ENg Lograda:';
+            }
+
+            if (syncGdpToSuggested) {
+                profile.customGdp = null;
+            }
+
+            const rules = computeEngordaRules(profile);
+            lastComputedRules = rules;
+
+            if (syncGdpToSuggested && !isLechero) {
+                document.getElementById('animal-gdp').value = rules.gdp.opt.toFixed(2);
+            }
+
+            const gdpBadge = document.getElementById('animal-gdp-range-badge');
+            if (gdpBadge) {
+                gdpBadge.textContent = `Rango: ${rules.gdp.min.toFixed(2)} - ${rules.gdp.max.toFixed(2)} kg/d`;
+            }
+
+            document.getElementById('req-cms').value = rules.cmsKg.opt.toFixed(2);
+            document.getElementById('req-cms-pct').textContent = `${rules.cmsPct.opt.toFixed(2)}% del Peso Vivo (${rules.cmsPct.min.toFixed(2)}% - ${rules.cmsPct.max.toFixed(2)}%)`;
+            document.getElementById('req-cms-range').textContent = `Rango sugerido: ${rules.cmsKg.min.toFixed(1)} - ${rules.cmsKg.max.toFixed(1)} kg/d`;
+
+            document.getElementById('req-pc').value = rules.pc.opt.toFixed(1);
+            document.getElementById('req-pc-range').textContent = `Base Seca • Rango: ${rules.pc.min.toFixed(1)}% - ${rules.pc.max.toFixed(1)}%`;
+
+            document.getElementById('req-en').value = rules.en.opt.toFixed(2);
+            document.getElementById('req-en-range').textContent = `Mcal/kg MS • Rango: ${rules.en.min.toFixed(2)} - ${rules.en.max.toFixed(2)}`;
+
+            document.getElementById('req-fdn').value = rules.fdn.opt.toFixed(1);
+            document.getElementById('req-fdn-range').textContent = `Solo Forrajes • Rango: ${rules.fdn.min.toFixed(1)}% - ${rules.fdn.max.toFixed(1)}%`;
+
+            document.getElementById('nota-tecnica-texto').textContent = rules.nota;
+            checkManualRequirementsOutOfRange();
+        }
+
+        // -------------------------------------------------------------------
+        // 3B. RENDERIZADO DEL MÓDULO "REGLAS DE ENGORDE"
+        // -------------------------------------------------------------------
+        const LABELS_ETAPA = {
+            recepcion: 'Recepción',
+            desarrollo: 'Desarrollo',
+            finalizacion: 'Finalización',
+            lechero: 'Lechero',
+            mantenimiento: 'Mantenimiento'
+        };
+        const LABELS_SEXO = {
+            macho_entero: 'Toro Entero',
+            novillo: 'Novillo Castrado',
+            novilla: 'Novilla / Vaquilla',
+            vaca_vieja: 'Vaca Vieja / Desecho'
+        };
+        const LABELS_RAZA = {
+            cruza: 'Cruza F1',
+            europeo: 'Europeo',
+            cebu: 'Cebú',
+            lechero: 'Lechero'
+        };
+        const LABELS_TALLA = {
+            chica: 'Talla Chica',
+            media: 'Talla Media',
+            grande: 'Talla Grande'
+        };
+
+        function getReglasProfile() {
+            return {
+                proposito: document.getElementById('reglas-proposito').value,
+                sexo: document.getElementById('reglas-sexo').value,
+                raza: document.getElementById('reglas-raza').value,
+                talla: document.getElementById('reglas-talla').value,
+                peso: parseFloat(document.getElementById('reglas-peso').value) || 450,
+                edad: parseFloat(document.getElementById('reglas-edad').value) || 80,
+                temp: parseFloat(document.getElementById('reglas-temp').value) || 28,
+                implante: document.getElementById('reglas-implante').checked
+            };
+        }
+
+        function renderReglasModule() {
+            const tbody = document.getElementById('reglas-ranges-tbody');
+            if (!tbody) return;
+
+            const p = getReglasProfile();
+            const r = computeEngordaRules(p);
+            const isLechero = p.proposito === 'lechero';
+
+            document.getElementById('reglas-profile-summary').textContent =
+                `${LABELS_ETAPA[p.proposito]} • ${LABELS_SEXO[p.sexo]} • ${LABELS_RAZA[p.raza]} (${LABELS_TALLA[p.talla]}) • ${p.edad} meses • ${p.peso} kg`;
+            document.getElementById('reglas-fase-badge').textContent =
+                `Peso Maduro Ref: ${r.srw} kg (${r.maturityPct}% madurez)`;
+
+            document.getElementById('reglas-diagnostico-box').innerHTML = `
+                <p class="font-bold text-amber-900">Diagnóstico Fisiológico y Nutricional:</p>
+                <p>${r.nota}</p>
+            `;
+
+            const rows = [
+                {
+                    name: 'Ganancia Diaria de Peso (GDP)',
+                    min: `${r.gdp.min.toFixed(2)} kg/d`,
+                    opt: `${r.gdp.opt.toFixed(2)} kg/d`,
+                    max: `${r.gdp.max.toFixed(2)} kg/d`,
+                    note: 'Potencial biológico esperado sin trastornos digestivos'
+                },
+                {
+                    name: 'Consumo Materia Seca (CMS kg/d)',
+                    min: `${r.cmsKg.min.toFixed(2)} kg/d`,
+                    opt: `${r.cmsKg.opt.toFixed(2)} kg/d`,
+                    max: `${r.cmsKg.max.toFixed(2)} kg/d`,
+                    note: `${r.cmsPct.min.toFixed(2)}% a ${r.cmsPct.max.toFixed(2)}% del Peso Vivo`
+                },
+                {
+                    name: 'Proteína Cruda (% PC en BS)',
+                    min: `${r.pc.min.toFixed(1)}%`,
+                    opt: `${r.pc.opt.toFixed(1)}%`,
+                    max: `${r.pc.max.toFixed(1)}%`,
+                    note: p.sexo === 'vaca_vieja' ? 'Baja en vaca adulta (evita desperdicio de N)' : 'Soporta síntesis de tejido magro'
+                },
+                {
+                    name: isLechero ? 'Energía Neta Lactancia (ENl)' : 'Energía Neta Ganancia (ENg)',
+                    min: `${r.en.min.toFixed(2)} Mcal`,
+                    opt: `${r.en.opt.toFixed(2)} Mcal`,
+                    max: `${r.en.max.toFixed(2)} Mcal`,
+                    note: `ENm dieta equiv: ${r.enmDieta.min.toFixed(2)} - ${r.enmDieta.max.toFixed(2)} Mcal/kg`
+                },
+                {
+                    name: 'FDN de Forraje (% FDNf en BS)',
+                    min: `${r.fdn.min.toFixed(1)}%`,
+                    opt: `${r.fdn.opt.toFixed(1)}%`,
+                    max: `${r.fdn.max.toFixed(1)}%`,
+                    note: `Forraje sugerido en dieta: ${r.forrajePctText} BS`
+                },
+                {
+                    name: 'Conversión Alimenticia (kg MS/kg GDP)',
+                    min: r.ca.min > 0 ? `${r.ca.min.toFixed(1)} : 1` : '—',
+                    opt: r.ca.opt > 0 ? `${r.ca.opt.toFixed(1)} : 1` : '—',
+                    max: r.ca.max > 0 ? `${r.ca.max.toFixed(1)} : 1` : '—',
+                    note: 'Menor relación = mayor eficiencia económica'
+                }
+            ];
+
+            tbody.innerHTML = rows.map(row => `
+                <tr class="hover:bg-slate-50/80 transition-colors">
+                    <td class="py-3 px-4 font-semibold text-slate-900">${row.name}</td>
+                    <td class="py-3 px-4 text-right text-slate-600 font-medium">${row.min}</td>
+                    <td class="py-3 px-4 text-right font-extrabold text-forest-900 bg-forest-50/50">${row.opt}</td>
+                    <td class="py-3 px-4 text-right text-slate-600 font-medium">${row.max}</td>
+                    <td class="py-3 px-4 hidden sm:table-cell text-xs text-slate-500">${row.note}</td>
+                </tr>
+            `).join('');
+
+            document.getElementById('reglas-nrc-footer').innerHTML = `
+                <div class="bg-white p-2.5 rounded-xl border border-slate-200">
+                    <span class="block text-[10px] text-slate-500">ENm Mantenimiento</span>
+                    <span class="font-bold text-slate-900">${r.enmReqMcalDia.toFixed(2)} Mcal/d</span>
+                </div>
+                <div class="bg-white p-2.5 rounded-xl border border-slate-200">
+                    <span class="block text-[10px] text-slate-500">CMS % Peso Vivo</span>
+                    <span class="font-bold text-forest-900">${r.cmsPct.opt.toFixed(2)}% PV</span>
+                </div>
+                <div class="bg-white p-2.5 rounded-xl border border-slate-200">
+                    <span class="block text-[10px] text-slate-500">Relación Forraje BS</span>
+                    <span class="font-bold text-slate-900">${r.forrajePctText}</span>
+                </div>
+                <div class="bg-white p-2.5 rounded-xl border border-slate-200">
+                    <span class="block text-[10px] text-slate-500">Peso Venta Sugerido</span>
+                    <span class="font-bold text-emerald-700">${Math.round(r.srw * 0.96)} - ${Math.round(r.srw * 1.04)} kg</span>
+                </div>
+            `;
+
+            renderReglasStageThresholds(p, r);
+            renderReglasComparison(p, r);
+        }
+
+        function renderReglasStageThresholds(p, r) {
+            const container = document.getElementById('reglas-stages-cards');
+            const adviceBox = document.getElementById('reglas-transition-advice');
+            if (!container || !adviceBox) return;
+
+            const srw = r.srw;
+            document.getElementById('reglas-stages-subtitle').textContent =
+                `Umbrales de cambio de dieta para ${LABELS_SEXO[p.sexo]} • ${LABELS_RAZA[p.raza]} • ${LABELS_TALLA[p.talla]} (Peso objetivo de venta: ${Math.round(srw * 0.95)} – ${Math.round(srw * 1.03)} kg).`;
+
+            let stages = [];
+            if (p.sexo === 'vaca_vieja') {
+                const pFin = Math.round(srw * 1.02);
+                const pIni = Math.round(srw * 0.72);
+                stages = [
+                    {
+                        title: '1. Recepción (Días 1-14)',
+                        range: `${pIni} – ${pIni + 30} kg`,
+                        diet: '45-55% Forraje • 11.5% PC • 0.85 ENg',
+                        desc: 'Adaptación ruminal obligatoria. Vacas de potrero sufren acidosis rápido si entran directo a grano.'
+                    },
+                    {
+                        title: '2. Transición (Días 15-28)',
+                        range: `${pIni + 30} – ${pIni + 55} kg`,
+                        diet: '25-35% Forraje • 11.2% PC • 1.05 ENg',
+                        desc: 'Subir concentrado en 2 escalones (cada 7 días) por la tarde. Incorporar ionóforo gradualmente.'
+                    },
+                    {
+                        title: '3. Finalización (Días 29-65)',
+                        range: `${pIni + 55} – ${pFin - 20} kg`,
+                        diet: '15-22% Forraje • 10.8% PC • 1.20 ENg',
+                        desc: 'Fase de máxima ganancia compensatoria (1.2-1.5 kg/d). Mantener 10-13% FDN de forraje.'
+                    },
+                    {
+                        title: '4. Salida / Venta (Día 65-75)',
+                        range: `${pFin - 20} – ${pFin} kg`,
+                        diet: 'No extender >75-85 días',
+                        desc: 'Después de 75 días la conversión se dispara (>10:1) y el costo por kg ganado deja de ser rentable.'
+                    }
+                ];
+                adviceBox.innerHTML = `<strong>Regla de Cambio para Vaca Vieja / Desecho:</strong> No existe etapa larga de "Desarrollo" porque ya no crece hueso. Se pasa de Recepción (14 días) → Transición (14 días) → Finalización corta (35-45 días) y venta inmediata al alcanzar cobertura de grasa (condición corporal 6-7), sin esperar a que supere ${pFin} kg.`;
+            } else {
+                const wRecMax = Math.round(srw * 0.52);
+                const wDesMax = Math.round(srw * 0.74);
+                const wFinTardia = Math.round(srw * 0.87);
+                const wVenta = Math.round(srw * 1.00);
+
+                stages = [
+                    {
+                        title: '1. Recepción y Adaptación',
+                        range: `< ${wRecMax} kg (Días 1-21)`,
+                        diet: '40-55% Forraje • 18-24% FDNf',
+                        desc: 'Estabilizar consumo y salud. Independiente del peso de llegada, todo lote nuevo requiere 14-21 días de adaptación.'
+                    },
+                    {
+                        title: '2. Desarrollo (Crecimiento)',
+                        range: `${wRecMax} – ${wDesMax} kg`,
+                        diet: '20-30% Forraje • 12-16% FDNf',
+                        desc: 'Priorizar deposición muscular (PC 13.5-14.5%, ENg 1.05-1.20). Cambiar a Finalización al llegar a ~74% del peso de venta.'
+                    },
+                    {
+                        title: '3. Finalización Temprana',
+                        range: `${wDesMax} – ${wFinTardia} kg`,
+                        diet: '10-16% Forraje • 7-10% FDNf',
+                        desc: 'Subir energía (ENg 1.22-1.32 Mcal/kg) de forma escalonada (7-10 días). Máxima eficiencia alimenticia.'
+                    },
+                    {
+                        title: '4. Acabado / Recta Final',
+                        range: `${wFinTardia} – ${wVenta} kg`,
+                        diet: 'Ajuste fino (-0.5% PC) • 7-9% FDNf',
+                        desc: `Últimos 35-45 días (≈60-75 kg finales). Mantener misma base energética para no tumbar consumo.`
+                    }
+                ];
+
+                adviceBox.innerHTML = `<strong>¿Mantener o ajustar la dieta en la recta final (${wFinTardia} kg a ${wVenta} kg)?</strong> En un <strong>${LABELS_SEXO[p.sexo]} ${LABELS_RAZA[p.raza]} (${LABELS_TALLA[p.talla]})</strong>, entre <strong>${wFinTardia} kg y ${wVenta} kg</strong> ya no debes cambiar bruscamente los ingredientes ni el nivel de forraje (eso provoca acidosis subaguda y caída de consumo). Lo correcto es <strong>mantener la misma dieta base de finalización</strong> y aplicar únicamente un <strong>ajuste fino económico</strong> en los últimos 30-35 días: bajar <strong>0.4% a 0.8% de Proteína Cruda</strong> (ahorro en pasta de soya/canola) salvo que incorpores un $\\beta$-agonista (ej. zilpaterol los últimos 20-30 días), en cuyo caso mantienes la PC sin bajarla.`;
+            }
+
+            container.innerHTML = stages.map(s => `
+                <div class="rounded-xl border border-slate-200 bg-slate-50/70 p-4 flex flex-col justify-between gap-2">
+                    <div>
+                        <span class="block text-xs font-extrabold text-forest-900">${s.title}</span>
+                        <span class="inline-block mt-1 px-2 py-0.5 rounded-md bg-white border border-slate-200 text-xs font-bold text-slate-800">${s.range}</span>
+                        <p class="text-[11px] font-semibold text-forest-700 mt-2">${s.diet}</p>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed">${s.desc}</p>
+                </div>
+            `).join('');
+        }
+
+        function renderReglasComparison(currentProfile, currentRules) {
+            const sec = document.getElementById('reglas-compare-section');
+            if (!sec) return;
+            if (!pinnedCompareProfile || !pinnedCompareRules) {
+                sec.classList.add('hidden');
+                return;
+            }
+
+            sec.classList.remove('hidden');
+            const pA = pinnedCompareProfile;
+            const rA = pinnedCompareRules;
+            const pB = currentProfile;
+            const rB = currentRules;
+
+            document.getElementById('cmp-head-a').textContent = `A: ${LABELS_ETAPA[pA.proposito]} • ${LABELS_SEXO[pA.sexo]} (${pA.peso}kg, ${pA.edad}m)`;
+            document.getElementById('cmp-head-b').textContent = `B: ${LABELS_ETAPA[pB.proposito]} • ${LABELS_SEXO[pB.sexo]} (${pB.peso}kg, ${pB.edad}m)`;
+
+            const fmtDiff = (val, unit, dec = 2) => {
+                const sign = val > 0.005 ? '+' : '';
+                const cls = Math.abs(val) < 0.01 ? 'text-slate-400' : (val > 0 ? 'text-emerald-700 font-bold' : 'text-amber-700 font-bold');
+                return `<span class="${cls}">${sign}${val.toFixed(dec)} ${unit}</span>`;
+            };
+
+            const metrics = [
+                { label: 'GDP Esperada (kg/d)', a: `${rA.gdp.opt.toFixed(2)} (${rA.gdp.min.toFixed(2)}-${rA.gdp.max.toFixed(2)})`, b: `${rB.gdp.opt.toFixed(2)} (${rB.gdp.min.toFixed(2)}-${rB.gdp.max.toFixed(2)})`, diff: fmtDiff(rB.gdp.opt - rA.gdp.opt, 'kg/d', 2) },
+                { label: 'CMS (kg/día)', a: `${rA.cmsKg.opt.toFixed(2)} kg (${rA.cmsPct.opt.toFixed(2)}%)`, b: `${rB.cmsKg.opt.toFixed(2)} kg (${rB.cmsPct.opt.toFixed(2)}%)`, diff: fmtDiff(rB.cmsKg.opt - rA.cmsKg.opt, 'kg/d', 2) },
+                { label: 'Proteína Cruda (% PC)', a: `${rA.pc.opt.toFixed(1)}% (${rA.pc.min.toFixed(1)}-${rA.pc.max.toFixed(1)}%)`, b: `${rB.pc.opt.toFixed(1)}% (${rB.pc.min.toFixed(1)}-${rB.pc.max.toFixed(1)}%)`, diff: fmtDiff(rB.pc.opt - rA.pc.opt, '%', 1) },
+                { label: 'Energía ENg (Mcal/kg)', a: `${rA.en.opt.toFixed(2)} (${rA.en.min.toFixed(2)}-${rA.en.max.toFixed(2)})`, b: `${rB.en.opt.toFixed(2)} (${rB.en.min.toFixed(2)}-${rB.en.max.toFixed(2)})`, diff: fmtDiff(rB.en.opt - rA.en.opt, 'Mcal', 2) },
+                { label: 'FDN de Forraje (% FDNf)', a: `${rA.fdn.opt.toFixed(1)}% (${rA.fdn.min.toFixed(1)}-${rA.fdn.max.toFixed(1)}%)`, b: `${rB.fdn.opt.toFixed(1)}% (${rB.fdn.min.toFixed(1)}-${rB.fdn.max.toFixed(1)}%)`, diff: fmtDiff(rB.fdn.opt - rA.fdn.opt, '%', 1) }
+            ];
+
+            document.getElementById('reglas-compare-tbody').innerHTML = metrics.map(m => `
+                <tr class="hover:bg-slate-50/70">
+                    <td class="py-2.5 px-4 font-semibold text-slate-800">${m.label}</td>
+                    <td class="py-2.5 px-4 text-right text-blue-900 font-medium">${m.a}</td>
+                    <td class="py-2.5 px-4 text-right text-forest-900 font-bold">${m.b}</td>
+                    <td class="py-2.5 px-4 text-right">${m.diff}</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderReglasMasterMatrix() {
+            const tbody = document.getElementById('reglas-matrix-tbody');
+            if (!tbody) return;
+            const filter = document.getElementById('reglas-matrix-filter')?.value || 'all';
+
+            const presets = [
+                { proposito: 'recepcion',    sexo: 'macho_entero', raza: 'cruza', talla: 'media', edad: 8,  peso: 230 },
+                { proposito: 'recepcion',    sexo: 'novillo',      raza: 'cruza', talla: 'media', edad: 9,  peso: 240 },
+                { proposito: 'recepcion',    sexo: 'novilla',      raza: 'cruza', talla: 'media', edad: 9,  peso: 220 },
+                { proposito: 'recepcion',    sexo: 'vaca_vieja',   raza: 'cruza', talla: 'media', edad: 80, peso: 350 },
+                { proposito: 'desarrollo',   sexo: 'macho_entero', raza: 'cruza', talla: 'media', edad: 12, peso: 340 },
+                { proposito: 'desarrollo',   sexo: 'novillo',      raza: 'cruza', talla: 'media', edad: 13, peso: 330 },
+                { proposito: 'desarrollo',   sexo: 'novilla',      raza: 'cruza', talla: 'media', edad: 12, peso: 300 },
+                { proposito: 'desarrollo',   sexo: 'vaca_vieja',   raza: 'cruza', talla: 'media', edad: 80, peso: 390 },
+                { proposito: 'finalizacion', sexo: 'macho_entero', raza: 'cruza', talla: 'media', edad: 18, peso: 480 },
+                { proposito: 'finalizacion', sexo: 'novillo',      raza: 'cruza', talla: 'media', edad: 18, peso: 460 },
+                { proposito: 'finalizacion', sexo: 'novilla',      raza: 'cruza', talla: 'media', edad: 16, peso: 450 },
+                { proposito: 'finalizacion', sexo: 'vaca_vieja',   raza: 'cruza', talla: 'media', edad: 80, peso: 450 }
+            ];
+
+            tbody.innerHTML = presets
+                .filter(p => filter === 'all' || p.proposito === filter)
+                .map(p => {
+                    const r = computeEngordaRules(p);
+                    const badgeCls = p.proposito === 'recepcion'
+                        ? 'bg-sky-100 text-sky-900'
+                        : p.proposito === 'desarrollo'
+                            ? 'bg-amber-100 text-amber-900'
+                            : 'bg-emerald-100 text-emerald-900';
+
+                    return `
+                        <tr class="reglas-matrix-row hover:bg-forest-50/60 cursor-pointer transition-colors"
+                            data-prop="${p.proposito}" data-sexo="${p.sexo}" data-raza="${p.raza}" data-talla="${p.talla}" data-edad="${p.edad}" data-peso="${p.peso}">
+                            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[11px] font-bold ${badgeCls}">${LABELS_ETAPA[p.proposito]}</span></td>
+                            <td class="py-3 px-4 font-semibold text-slate-900">${LABELS_SEXO[p.sexo]} <span class="text-xs font-normal text-slate-500">• ${p.edad}m • ${p.peso} kg</span></td>
+                            <td class="py-3 px-4 text-center font-medium text-slate-800">${r.gdp.min.toFixed(2)} – ${r.gdp.max.toFixed(2)}</td>
+                            <td class="py-3 px-4 text-center font-medium text-slate-800">${r.cmsPct.min.toFixed(2)} – ${r.cmsPct.max.toFixed(2)}%</td>
+                            <td class="py-3 px-4 text-center font-bold text-forest-900">${r.pc.min.toFixed(1)} – ${r.pc.max.toFixed(1)}%</td>
+                            <td class="py-3 px-4 text-center font-medium text-slate-800">${r.en.min.toFixed(2)} – ${r.en.max.toFixed(2)}</td>
+                            <td class="py-3 px-4 text-center font-medium text-slate-800">${r.fdn.min.toFixed(1)} – ${r.fdn.max.toFixed(1)}%</td>
+                        </tr>
+                    `;
+                }).join('');
+        }
+
+        function setReglasForm(p) {
+            document.getElementById('reglas-proposito').value = p.proposito;
+            document.getElementById('reglas-sexo').value = p.sexo;
+            document.getElementById('reglas-raza').value = p.raza || 'cruza';
+            document.getElementById('reglas-talla').value = p.talla || 'media';
+            document.getElementById('reglas-edad').value = p.edad;
+            document.getElementById('reglas-peso').value = p.peso;
+            if (typeof p.temp !== 'undefined') document.getElementById('reglas-temp').value = p.temp;
+            if (typeof p.implante !== 'undefined') document.getElementById('reglas-implante').checked = Boolean(p.implante);
+            renderReglasModule();
+        }
+
         function buildDefaultPastoreo() {
             const today = new Date().toISOString().split('T')[0];
             const cuadros = [];
             for (let i = 1; i <= 46; i++) {
-                // Simular rotación inicial escalonada realista
+                const franja = i <= 23 ? 'Norte' : 'Sur';
                 const daysAgo = i === 1 ? 0 : (47 - i);
                 const d = new Date();
                 d.setDate(d.getDate() - daysAgo);
                 cuadros.push({
                     id: i,
-                    franja: i <= 23 ? 'Norte' : 'Sur',
+                    franja,
                     area: 1140,
                     fechaSalida: d.toISOString().split('T')[0],
                     notas: ''
@@ -1354,118 +2378,6 @@
             document.getElementById('confirm-msg').textContent = msg;
             confirmCallback = onConfirm;
             document.getElementById('modal-confirm').classList.remove('hidden');
-        }
-
-        // -------------------------------------------------------------------
-        // 3. CÁLCULO DE REQUERIMIENTOS NUTRICIONALES (NRC / NASEM)
-        // -------------------------------------------------------------------
-        function calculateNutritionalRequirements() {
-            const proposito = document.getElementById('animal-proposito').value;
-            const sexo = document.getElementById('animal-sexo').value;
-            const raza = document.getElementById('animal-raza').value;
-            const peso = parseFloat(document.getElementById('animal-peso').value) || 320;
-            const gdp = parseFloat(document.getElementById('animal-gdp').value) || 1.5;
-            const leche = parseFloat(document.getElementById('animal-leche').value) || 22;
-            const temp = parseFloat(document.getElementById('animal-temp').value) || 28;
-            const implante = document.getElementById('animal-implante').checked;
-
-            const containerGdp = document.getElementById('container-meta-gdp');
-            const containerLeche = document.getElementById('container-meta-leche');
-            const enLabel = document.getElementById('req-en-label');
-            const kpiEnLabel = document.getElementById('kpi-en-label');
-
-            if (proposito === 'lechero') {
-                containerGdp.classList.add('hidden');
-                containerLeche.classList.remove('hidden');
-                enLabel.textContent = 'Energía Neta Lactancia (ENl)';
-                kpiEnLabel.textContent = 'ENl Lograda:';
-            } else {
-                containerGdp.classList.remove('hidden');
-                containerLeche.classList.add('hidden');
-                enLabel.textContent = 'Energía de Ganancia (ENg)';
-                kpiEnLabel.textContent = 'ENg Lograda:';
-            }
-
-            let cmsPct = 2.65;
-            let pcReq = 14.5;
-            let enReq = 1.30;
-            let fdnReq = 16.0;
-            let nota = '';
-
-            if (proposito === 'recepcion') {
-                cmsPct = 2.35;
-                // En recepción (meta típica 0.70 - 1.10 kg/d), ENg oscila entre 0.75 y 0.90 Mcal/kg
-                const gdpClamped = Math.max(0.5, Math.min(1.4, gdp));
-                enReq = 0.75 + (gdpClamped - 0.75) * 0.24 + ((peso - 250) / 100) * 0.02;
-                enReq = Math.max(0.75, Math.min(0.95, enReq));
-                pcReq = 13.8 + (gdpClamped - 0.75) * 1.4;
-                fdnReq = Math.max(18.0, Math.min(25.0, 24.5 - (gdpClamped - 0.75) * 6.0));
-                nota = `Etapa de recepción (meta ${gdp.toFixed(2)} kg/d): ${fdnReq.toFixed(1)}% de FDN de forraje (≈${Math.round(fdnReq / 0.7)}% de rastrojo en BS) y ${enReq.toFixed(2)} Mcal ENg para estabilizar el rumen sin sobrecarga energética.`;
-            } else if (proposito === 'desarrollo') {
-                cmsPct = 2.65;
-                const gdpClamped = Math.max(0.9, Math.min(1.8, gdp));
-                enReq = 1.05 + (gdpClamped - 1.15) * 0.25 + ((peso - 300) / 100) * 0.02;
-                enReq = Math.max(1.02, Math.min(1.24, enReq));
-                pcReq = 13.6 + (gdpClamped - 1.15) * 1.6;
-                fdnReq = Math.max(11.0, Math.min(16.5, 14.5 - (gdpClamped - 1.20) * 4.0));
-                nota = `Etapa de desarrollo (meta ${gdp.toFixed(2)} kg/d): ${fdnReq.toFixed(1)}% de FDN de forraje (≈${Math.round(fdnReq / 0.7)}% de rastrojo en BS) y ${enReq.toFixed(2)} Mcal ENg para maximizar crecimiento muscular.`;
-            } else if (proposito === 'finalizacion') {
-                cmsPct = 2.55;
-                const gdpClamped = Math.max(1.2, Math.min(2.2, gdp));
-                enReq = 1.20 + (gdpClamped - 1.45) * 0.22 + ((peso - 400) / 100) * 0.02;
-                enReq = Math.max(1.18, Math.min(1.32, enReq));
-                pcReq = 12.6 + (gdpClamped - 1.45) * 1.3;
-                fdnReq = Math.max(6.5, Math.min(10.0, 8.5 - (gdpClamped - 1.50) * 2.5));
-                nota = `Etapa de finalización (meta ${gdp.toFixed(2)} kg/d): ${fdnReq.toFixed(1)}% de FDN de forraje (≈${Math.round(fdnReq / 0.7)}% de rastrojo en BS) y ${enReq.toFixed(2)} Mcal ENg. Requiere transición gradual.`;
-            } else if (proposito === 'lechero') {
-                cmsPct = 2.2 + (leche * 0.045);
-                pcReq = 15.5 + (leche - 20) * 0.12;
-                enReq = 1.55 + (leche - 20) * 0.012;
-                fdnReq = 20.0;
-                nota = 'Ganado lechero: requiere alto consumo de materia seca y al menos 20% de FDN de forraje efectivo (≈28-32% FDN total) para mantener grasa en leche y rumia.';
-            } else {
-                cmsPct = 2.0;
-                pcReq = 10.0;
-                enReq = 0.80;
-                fdnReq = 28.0;
-                nota = 'Mantenimiento: dieta económica basada en forrajes (28% FDN de forraje ≈40% rastrojo en BS) para conservar condición corporal.';
-            }
-
-            if (sexo === 'macho_entero') {
-                pcReq += 0.4;
-            } else if (sexo === 'hembra') {
-                cmsPct -= 0.08;
-                pcReq -= 0.3;
-            }
-
-            if (raza === 'cebu') {
-                cmsPct -= 0.10;
-            } else if (raza === 'europeo') {
-                cmsPct += 0.08;
-            }
-
-            if (temp > 32) {
-                const factorCalor = Math.min(0.15, (temp - 32) * 0.012);
-                cmsPct *= (1 - factorCalor);
-                pcReq += 0.4;
-                nota += ` Estrés calórico (${temp}°C): consumo ajustado -${(factorCalor * 100).toFixed(1)}%.`;
-            } else if (temp < 10) {
-                cmsPct *= 1.05;
-            }
-
-            if (implante) {
-                cmsPct *= 1.04;
-                pcReq += 0.6;
-            }
-
-            const cmsKg = (peso * cmsPct) / 100;
-
-            document.getElementById('req-cms').value = cmsKg.toFixed(2);
-            document.getElementById('req-cms-pct').textContent = `${cmsPct.toFixed(2)}% del Peso Vivo`;
-            document.getElementById('req-pc').value = Math.max(8, pcReq).toFixed(1);
-            document.getElementById('req-en').value = Math.max(0.6, enReq).toFixed(2);
-            document.getElementById('req-fdn').value = Math.max(6, fdnReq).toFixed(1);
-            document.getElementById('nota-tecnica-texto').textContent = nota;
         }
 
         // -------------------------------------------------------------------
@@ -2372,6 +3284,10 @@
 
                     if (target === 'pastoreo') renderPastoreoModule();
                     if (target === 'insumos') renderDatabaseTable();
+                    if (target === 'reglas') {
+                        renderReglasModule();
+                        renderReglasMasterMatrix();
+                    }
 
                     // Cerrar sidebar en móvil
                     document.getElementById('sidebar').classList.add('-translate-x-full');
@@ -2392,28 +3308,104 @@
             document.getElementById('sidebar-backdrop')?.addEventListener('click', closeMobileMenu);
 
             // Recalcular requerimientos al cambiar perfil
-            document.getElementById('animal-proposito')?.addEventListener('change', (e) => {
-                const prop = e.target.value;
-                const gdpInput = document.getElementById('animal-gdp');
-                if (gdpInput) {
-                    if (prop === 'recepcion') gdpInput.value = '0.85';
-                    else if (prop === 'desarrollo') gdpInput.value = '1.35';
-                    else if (prop === 'finalizacion') gdpInput.value = '1.65';
-                    else if (prop === 'mantenimiento') gdpInput.value = '0.40';
-                }
-                calculateNutritionalRequirements();
+            ['animal-proposito', 'animal-sexo', 'animal-raza', 'animal-talla'].forEach(id => {
+                document.getElementById(id)?.addEventListener('change', () => {
+                    calculateNutritionalRequirements(true);
+                });
             });
 
-            ['animal-sexo', 'animal-raza', 'animal-peso', 'animal-edad', 'animal-gdp', 'animal-leche', 'animal-temp', 'animal-implante'].forEach(id => {
+            ['animal-peso', 'animal-edad', 'animal-gdp', 'animal-leche', 'animal-temp', 'animal-implante'].forEach(id => {
                 const el = document.getElementById(id);
-                el?.addEventListener('change', calculateNutritionalRequirements);
+                el?.addEventListener('change', () => calculateNutritionalRequirements(false));
                 if (el && el.tagName === 'INPUT' && el.type === 'number') {
-                    el.addEventListener('input', calculateNutritionalRequirements);
+                    el.addEventListener('input', () => calculateNutritionalRequirements(false));
                 }
             });
+
+            // Validar cuando el usuario ajusta manualmente los requerimientos
+            ['req-cms', 'req-pc', 'req-en', 'req-fdn'].forEach(id => {
+                document.getElementById(id)?.addEventListener('input', checkManualRequirementsOutOfRange);
+            });
+
             document.getElementById('btn-recalc-req')?.addEventListener('click', () => {
-                calculateNutritionalRequirements();
-                showToast('Requerimientos recalculados');
+                calculateNutritionalRequirements(true);
+                showToast('Requerimientos recalculados según Reglas de Engorde');
+            });
+
+            document.getElementById('btn-open-reglas-from-form')?.addEventListener('click', () => {
+                const fp = getFormulatorProfile();
+                setReglasForm(fp);
+                document.querySelector('[data-tab="reglas"]')?.click();
+            });
+
+            // Eventos del módulo Reglas de Engorde
+            ['reglas-proposito', 'reglas-sexo', 'reglas-raza', 'reglas-talla', 'reglas-peso', 'reglas-edad', 'reglas-temp', 'reglas-implante'].forEach(id => {
+                const el = document.getElementById(id);
+                el?.addEventListener('change', renderReglasModule);
+                if (el && el.tagName === 'INPUT' && el.type === 'number') {
+                    el.addEventListener('input', renderReglasModule);
+                }
+            });
+
+            document.getElementById('reglas-matrix-filter')?.addEventListener('change', renderReglasMasterMatrix);
+
+            document.getElementById('reglas-matrix-tbody')?.addEventListener('click', e => {
+                const row = e.target.closest('.reglas-matrix-row');
+                if (!row) return;
+                setReglasForm({
+                    proposito: row.dataset.prop,
+                    sexo: row.dataset.sexo,
+                    raza: row.dataset.raza,
+                    talla: row.dataset.talla,
+                    edad: parseInt(row.dataset.edad),
+                    peso: parseInt(row.dataset.peso)
+                });
+                document.getElementById('tab-reglas').scrollIntoView({ behavior: 'smooth', block: 'start' });
+                showToast('Combinación cargada en el simulador de reglas');
+            });
+
+            document.querySelectorAll('.reglas-preset-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const key = btn.dataset.preset;
+                    const map = {
+                        vaca_rec_350:    { proposito: 'recepcion',    sexo: 'vaca_vieja',   raza: 'cruza', talla: 'media', edad: 80, peso: 350 },
+                        vaca_fin_450:    { proposito: 'finalizacion', sexo: 'vaca_vieja',   raza: 'cruza', talla: 'media', edad: 80, peso: 450 },
+                        novilla_fin_450: { proposito: 'finalizacion', sexo: 'novilla',      raza: 'cruza', talla: 'media', edad: 16, peso: 450 },
+                        toro_fin_480:    { proposito: 'finalizacion', sexo: 'macho_entero', raza: 'cruza', talla: 'media', edad: 18, peso: 480 }
+                    };
+                    if (map[key]) {
+                        setReglasForm(map[key]);
+                        showToast('Ejemplo cargado en Reglas de Engorde');
+                    }
+                });
+            });
+
+            document.getElementById('btn-reglas-pin-compare')?.addEventListener('click', () => {
+                pinnedCompareProfile = getReglasProfile();
+                pinnedCompareRules = computeEngordaRules(pinnedCompareProfile);
+                renderReglasComparison(pinnedCompareProfile, pinnedCompareRules);
+                showToast('Perfil A fijado. Ahora cambia cualquier parámetro arriba para comparar.');
+            });
+
+            document.getElementById('btn-reglas-clear-compare')?.addEventListener('click', () => {
+                pinnedCompareProfile = null;
+                pinnedCompareRules = null;
+                document.getElementById('reglas-compare-section').classList.add('hidden');
+            });
+
+            document.getElementById('btn-reglas-send-formulator')?.addEventListener('click', () => {
+                const p = getReglasProfile();
+                document.getElementById('animal-proposito').value = p.proposito;
+                document.getElementById('animal-sexo').value = p.sexo;
+                document.getElementById('animal-raza').value = p.raza;
+                document.getElementById('animal-talla').value = p.talla;
+                document.getElementById('animal-peso').value = p.peso;
+                document.getElementById('animal-edad').value = p.edad;
+                document.getElementById('animal-temp').value = p.temp;
+                document.getElementById('animal-implante').checked = p.implante;
+                calculateNutritionalRequirements(true);
+                document.querySelector('[data-tab="formulacion"]')?.click();
+                showToast('Perfil y requerimientos enviados al Formulador');
             });
 
             // Selección y límites de insumos en Solver
@@ -2513,9 +3505,10 @@
                         proposito: document.getElementById('animal-proposito').value,
                         sexo: document.getElementById('animal-sexo').value,
                         raza: document.getElementById('animal-raza').value,
+                        talla: document.getElementById('animal-talla')?.value || 'media',
                         peso: parseFloat(document.getElementById('animal-peso').value) || 320,
                         edad: parseInt(document.getElementById('animal-edad').value) || 10,
-                        gdp: parseFloat(document.getElementById('animal-gdp').value) || 1.5,
+                        gdp: parseFloat(document.getElementById('animal-gdp').value) || 1.4,
                         leche: parseFloat(document.getElementById('animal-leche').value) || 22,
                         temp: parseFloat(document.getElementById('animal-temp').value) || 28,
                         implante: document.getElementById('animal-implante').checked
@@ -2606,15 +3599,22 @@
                     // 1. Restaurar Perfil del Animal y Manejo
                     if (fs.animal) {
                         document.getElementById('animal-proposito').value = fs.animal.proposito || 'desarrollo';
-                        document.getElementById('animal-sexo').value = fs.animal.sexo || 'macho_entero';
+                        let restoredSexo = fs.animal.sexo || 'macho_entero';
+                        if (restoredSexo === 'hembra') {
+                            restoredSexo = (fs.animal.edad && fs.animal.edad >= 42) ? 'vaca_vieja' : 'novilla';
+                        }
+                        document.getElementById('animal-sexo').value = restoredSexo;
                         document.getElementById('animal-raza').value = fs.animal.raza || 'cruza';
+                        if (document.getElementById('animal-talla')) {
+                            document.getElementById('animal-talla').value = fs.animal.talla || 'media';
+                        }
                         document.getElementById('animal-peso').value = fs.animal.peso ?? 320;
                         document.getElementById('animal-edad').value = fs.animal.edad ?? 10;
-                        document.getElementById('animal-gdp').value = fs.animal.gdp ?? 1.5;
+                        document.getElementById('animal-gdp').value = fs.animal.gdp ?? 1.4;
                         document.getElementById('animal-leche').value = fs.animal.leche ?? 22;
                         document.getElementById('animal-temp').value = fs.animal.temp ?? 28;
                         document.getElementById('animal-implante').checked = Boolean(fs.animal.implante);
-                        calculateNutritionalRequirements();
+                        calculateNutritionalRequirements(false);
                     }
 
                     // 2. Restaurar Requerimientos Nutricionales exactos guardados
@@ -2706,16 +3706,19 @@
                         document.getElementById('animal-proposito').value = 'desarrollo';
                         document.getElementById('animal-sexo').value = 'macho_entero';
                         document.getElementById('animal-raza').value = 'cruza';
+                        if (document.getElementById('animal-talla')) {
+                            document.getElementById('animal-talla').value = 'media';
+                        }
                         document.getElementById('animal-peso').value = 320;
                         document.getElementById('animal-edad').value = 10;
-                        document.getElementById('animal-gdp').value = 1.5;
+                        document.getElementById('animal-gdp').value = 1.4;
                         document.getElementById('animal-leche').value = 22;
                         document.getElementById('animal-temp').value = 28;
                         document.getElementById('animal-implante').checked = false;
-                        calculateNutritionalRequirements();
+                        calculateNutritionalRequirements(true);
 
-                        // 2. Restablecer selección y límites (Mín/Máx) de insumos conservando tus precios actuales
-                        const defaultBoundsMap = new Map(DEFAULT_INGREDIENTS.map(d => [d.id, d]));
+                        // 2. Restablecer selección y límites por defecto
+                        const defaultBoundsMap = new Map(DEFAULT_INGREDIENTS.map(i => [i.id, i]));
                         ingredients.forEach(ing => {
                             const def = defaultBoundsMap.get(ing.id);
                             ing.selected = true;
@@ -2983,9 +3986,11 @@
         // Arranque inicial de la aplicación
         window.addEventListener('DOMContentLoaded', () => {
             loadLocalState();
-            calculateNutritionalRequirements();
+            calculateNutritionalRequirements(true);
             renderSolverIngredientsTable();
             renderDatabaseTable();
+            renderReglasModule();
+            renderReglasMasterMatrix();
             renderPastoreoModule();
             renderDietHistoryList();
             bindUIEvents();
